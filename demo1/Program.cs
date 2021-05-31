@@ -29,7 +29,7 @@ namespace Demo
 		public static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
-				.WriteTo.Console()
+				.WriteTo.Console(applyThemeToRedirectedOutput: true)
 				.CreateBootstrapLogger();
 
 			test_psql();
