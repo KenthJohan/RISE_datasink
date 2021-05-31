@@ -14,10 +14,11 @@ namespace Demo
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			//https://entityframeworkcore.com/knowledge-base/53150930/how-to-avoid-not-safe-context-operations-in-ef-core-
+			//https://entityframeworkcore.com/knowledge-base/53150930/how-to-avoid-not-safe-context-operations-in-ef-core
+			services.AddControllers();
 			services.AddDbContext<Demo_Context>(ServiceLifetime.Transient);
 			//services.AddTransient<Demo_Context>();
-
+			
 			services
 				.AddGraphQLServer()
 				.AddType<User_Resolver>()
@@ -60,6 +61,7 @@ namespace Demo
 				.UseEndpoints(endpoints =>
 				{
 					endpoints.MapGraphQL();
+					endpoints.MapDefaultControllerRoute();
 				});
 		}
 	}
