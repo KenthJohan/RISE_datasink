@@ -9,7 +9,7 @@ namespace Demo
 	public class Program
 	{
 
-		public static string npgsql_connection = "Host=localhost:5432;Database=demo;Username=postgres;Password=secret";
+		public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=datasink;Password=datasink";
 		public static void test_psql()
 		{
 			Log.Information("NpgsqlConnection {s}", npgsql_connection);
