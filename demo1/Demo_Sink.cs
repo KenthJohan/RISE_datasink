@@ -94,9 +94,9 @@ namespace Demo
 	}
 
 
-	public static class Arena_Sink_Extension
+	public static class Demo_Sink_Extension
 	{
-		public static LoggerConfiguration Arena_Sink(this LoggerSinkConfiguration c, IFormatProvider p = null)
+		public static LoggerConfiguration Demo_Sink(this LoggerSinkConfiguration c, IFormatProvider p = null)
 		{
 			return c.Sink(new Demo_Sink(p));
 		}

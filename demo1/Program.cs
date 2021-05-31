@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using Npgsql;
 
 
@@ -30,7 +31,8 @@ namespace Demo
 		public static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
-				.WriteTo.Console(applyThemeToRedirectedOutput: true)
+				.WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)
+				.WriteTo.Demo_Sink()
 				.CreateBootstrapLogger();
 
 			test_psql();
