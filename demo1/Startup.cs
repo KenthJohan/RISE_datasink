@@ -38,6 +38,7 @@ namespace Demo
 				app.UseDeveloperExceptionPage();
 			}
 
+			DB.init(app);
 
 			/*
 			app.UseRouting();

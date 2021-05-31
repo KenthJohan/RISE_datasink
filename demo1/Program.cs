@@ -9,7 +9,8 @@ namespace Demo
 	public class Program
 	{
 
-		public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=datasink;Password=datasink";
+		public static string npgsql_connection = "Server=localhost; Port=5432; UserId=datasink; Password=datasink; Database=datasink";
+		//public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=postgres;Password=secret";
 		public static void test_psql()
 		{
 			Log.Information("NpgsqlConnection {s}", npgsql_connection);
@@ -33,6 +34,7 @@ namespace Demo
 				.CreateBootstrapLogger();
 
 			test_psql();
+			
 
 			CreateHostBuilder(args).Build().Run();
 		}
