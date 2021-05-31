@@ -39,9 +39,8 @@ namespace Demo
 
 		protected override void OnConfiguring(DbContextOptionsBuilder options)
 		{
-			string s = "Host=localhost:5432;Database=demo;Username=postgres;Password=secret";
-			options.UseNpgsql(s);
-			Log.Information("Connection string {s}", s);
+			options.UseNpgsql(Program.npgsql_connection);
+			Log.Information("UseNpgsql {s}", Program.npgsql_connection);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)
