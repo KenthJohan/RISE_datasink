@@ -4,7 +4,6 @@ using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Npgsql;
 
-
 namespace Demo
 {
 	public class Program
@@ -39,6 +38,16 @@ namespace Demo
 			
 
 			CreateHostBuilder(args).Build().Run();
+
+			CreateHostBuilder(args)
+				.UseSerilog((context, services, configuration) => configuration
+					.ReadFrom.Configuration(context.Configuration)
+					.ReadFrom.Services(services)
+					//.MinimumLevel.Verbose()
+					.WriteTo.Console()
+					.WriteTo.Demo_Sink())
+				.Build().Run();
+
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
