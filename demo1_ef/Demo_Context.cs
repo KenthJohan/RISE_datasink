@@ -28,6 +28,10 @@ namespace Demo
 {
 	public class Demo_Context : DbContext
 	{
+
+		private readonly ILoggerFactory _loggerFactory;
+		private readonly Serilog.ILogger log = Log.ForContext<Demo_Context>();
+
 		public DbSet<User> users { get; set; }
 		public DbSet<Book> books { get; set; }
 		public DbSet<Seriefloat> seriefloats { get; set; }
@@ -38,15 +42,17 @@ namespace Demo
 		public DbSet<Serie> series { get; set; }
 
 
-		public Demo_Context(DbContextOptions<Demo_Context> options)
+		public Demo_Context(ILoggerFactory loggerFactory, DbContextOptions<Demo_Context> options)
 			: base(options)
 		{
+			_loggerFactory = loggerFactory;
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder options)
 		{
-			options.UseNpgsql(Program.npgsql_connection);
-			Log.Information("UseNpgsql {s}", Program.npgsql_connection);
+			options.UseLoggerFactory(_loggerFactory);
+			options.UseNpgsql(DB.npgsql_connection);
+			log.Information("UseNpgsql {s}", DB.npgsql_connection);
 		}
 
 		protected override void OnModelCreating(ModelBuilder builder)

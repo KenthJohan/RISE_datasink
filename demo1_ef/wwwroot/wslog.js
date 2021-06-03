@@ -167,12 +167,12 @@ function app_append(app, row)
 
 	td = tr.insertCell(-1);
 	td.textContent = row["ClientIp"];
-	td.style.backgroundColor = random_hsla(row["ClientIp"]);
+	if (row["ClientIp"]) td.style.backgroundColor = random_hsla(row["ClientIp"]);
 	td.onclick = app_make_onclick(app, 1, app.n);
 
 	td = tr.insertCell(-1);
 	td.textContent = row["RequestId"];
-	td.style.backgroundColor = random_hsla(row["RequestId"]);
+	if (row["RequestId"]) td.style.backgroundColor = random_hsla(row["RequestId"]);
 	td.onclick = app_make_onclick(app, 2, app.n);
 
 	td = tr.insertCell(-1);
@@ -186,7 +186,7 @@ function app_append(app, row)
 
 	td = tr.insertCell(-1);
 	td.textContent = row["SourceContext"];
-	td.style.backgroundColor = random_hsla(row["SourceContext"]);
+	if (row["SourceContext"]) td.style.backgroundColor = random_hsla(row["SourceContext"]);
 	td.onclick = app_make_onclick(app, 4, app.n);
 
 	td = tr.insertCell(-1);

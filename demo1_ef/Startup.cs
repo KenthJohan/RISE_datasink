@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using Serilog;
 
@@ -17,6 +17,7 @@ namespace Demo
 			//https://entityframeworkcore.com/knowledge-base/53150930/how-to-avoid-not-safe-context-operations-in-ef-core
 			services.AddControllers();
 			services.AddDbContext<Demo_Context>(ServiceLifetime.Transient);
+			services.AddHttpContextAccessor();
 			//services.AddTransient<Demo_Context>();
 			
 			services
@@ -38,26 +39,16 @@ namespace Demo
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
 		{
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 			}
 
-			//DB.init(app);
-
-			/*
-			app.UseRouting();
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapGet("/", async context =>
-				{
-					await context.Response.WriteAsync("Hello World!");
-				});
-			});
-			*/
-
+			DB.init(app);
+			loggerFactory.AddSerilog();
+			app.UseSerilogRequestLogging();
 			app.UseWebSockets();
 			app.UseDefaultFiles();
 			app.UseStaticFiles();

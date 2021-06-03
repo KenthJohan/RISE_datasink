@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 using Serilog;
 
+using Npgsql;
+
+
 //https://www.codeproject.com/Articles/5263745/Return-DataTable-Using-Entity-Framework
 
 namespace Demo
@@ -15,6 +18,10 @@ namespace Demo
 	public static class DB
 	{
 
+		public static string npgsql_connection = "Server=localhost; Port=5432; UserId=datasink; Password=datasink; Database=datasink";
+		//public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=postgres;Password=secret";
+
+		private static readonly ILogger log = Log.ForContext(typeof(DB));
 
 		public static void dropall(DbContext context)
 		{
@@ -59,20 +66,10 @@ namespace Demo
 
 		public static void init(IApplicationBuilder app)
 		{
-			Log.Information("DB Init");
 			using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
 			{
 				var context = serviceScope.ServiceProvider.GetRequiredService<Demo_Context>();
-				//If all tables are dropped then they will be created here:
-				//dropall(context);
-				//context.Database.ExecuteSqlRaw("DROP TABLE course_user_edges CASCADE");
-				var deleted = context.Database.EnsureDeleted();
-				var created = context.Database.EnsureCreated();
-				if (deleted){Log.Information("Database delted");}
-				else{Log.Information("Database not delted, does not exist");}
-				if (created){Log.Information("Database created");}
-				else{Log.Information("Database not created, already exist");}
-				//Testing.db_add_example(context);
+				init1(context);
 			}
 		}
 
@@ -94,6 +91,24 @@ namespace Demo
 			context.add_test_data();
 
 			//Testing.db_add_example(context);
+		}
+
+
+
+		public static void test_psql()
+		{
+			log.Information("NpgsqlConnection {s}", npgsql_connection);
+			NpgsqlConnection conn = new NpgsqlConnection(npgsql_connection); 
+			conn.Open(); 
+			if (conn.State == System.Data.ConnectionState.Open)
+			{
+				log.Information("Success open postgreSQL connection. {@ConnectionState}", conn.State); 
+			}
+			else
+			{
+				log.Information("Failed open postgreSQL connection. {@ConnectionState}", conn.State); 
+			}
+			conn.Close(); 
 		}
 
 

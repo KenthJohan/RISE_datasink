@@ -4,45 +4,25 @@ using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Npgsql;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Demo
 {
 	public class Program
 	{
+		private static readonly ILogger log = Log.ForContext(typeof(Program));
 
-		public static string npgsql_connection = "Server=localhost; Port=5432; UserId=datasink; Password=datasink; Database=datasink";
-		//public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=postgres;Password=secret";
-		public static void test_psql()
-		{
-			Log.Information("NpgsqlConnection {s}", npgsql_connection);
-			NpgsqlConnection conn = new NpgsqlConnection(npgsql_connection); 
-			conn.Open(); 
-			if (conn.State == System.Data.ConnectionState.Open)
-			{
-				Log.Information("Success open postgreSQL connection. {@ConnectionState}", conn.State); 
-			}
-			else
-			{
-				Log.Information("Failed open postgreSQL connection. {@ConnectionState}", conn.State); 
-			}
-			conn.Close(); 
-		}
+
+
 
 		public static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
-				//.WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)
 				.WriteTo.Console(applyThemeToRedirectedOutput: true)
 				.WriteTo.Demo_Sink()
 				.CreateBootstrapLogger();
 
-			test_psql();
-
-			var optionsBuilder = new DbContextOptionsBuilder<Demo_Context>();
-			using var context = new Demo_Context(optionsBuilder.Options);
-			DB.init1(context);
-
-			CreateHostBuilder(args).Build().Run();
+			DB.test_psql();
 
 			CreateHostBuilder(args)
 				.UseSerilog((context, services, configuration) => configuration
@@ -55,11 +35,15 @@ namespace Demo
 
 		}
 
-		public static IHostBuilder CreateHostBuilder(string[] args) =>
-			Host.CreateDefaultBuilder(args)
+		public static IHostBuilder CreateHostBuilder(string[] args)
+		{
+
+			return Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
 				});
+		}
+
 	}
 }

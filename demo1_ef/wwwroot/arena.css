@@ -1,0 +1,123 @@
+table
+{
+	/*margin:20px;*/
+	border-collapse: collapse;
+	background-color: rgb(241, 239, 236);
+	/*font-family: Arial;*/
+	font-size: 14px;
+	font-family: 'Courier New', monospace;
+	/*font-family: "Comic Sans MS", "Comic Sans", cursive;*/
+}
+
+table > tbody
+{
+	white-space: pre;
+}
+
+td,th 
+{
+	border: 1px solid #cdc9c1;
+	text-align: left;
+	padding: 4px;
+}
+
+th[colspan="100"]
+{
+	background-color: rgb(51, 50, 46);
+	color: #fff;
+}
+
+th
+{
+	background-color: rgb(215, 213, 209);
+	color: #000;
+}
+td{}
+
+tr[selected]
+{
+	background-color: rgb(235, 213, 209);
+}
+
+tr.selected
+{
+	background-color: rgb(235, 213, 209);
+}
+
+.hide
+{
+	display: none !important;
+}
+
+.links .hrefmatch
+{
+	background-color:#444;
+	color: #DDD;
+}
+.links
+{
+	display: flex;
+}
+
+.links a
+{
+	padding:4px;
+	display:block;
+	background-color:#EEE;
+	border-style: double;
+	border-style: dotted;
+	border-style: ridge;
+	border-style: inset;
+	border-style: outset;
+	color: black;
+	text-decoration: none;
+}
+
+
+
+.example
+{
+	color: rgb(100, 10, 60);
+	text-decoration: underline;
+}
+
+.example:hover
+{
+	color: hotpink;
+	cursor: pointer;
+}
+
+textarea
+{
+	white-space: pre;
+	overflow-wrap: normal;
+	overflow-x: scroll;
+}
+
+h4
+{
+	margin-bottom: 2px;
+}
+
+
+nav h3
+{
+	background-color: rgb(87, 87, 87);
+	color: #fff;
+	text-align: center;
+	margin:0px;
+	padding:1px;
+	margin-bottom:20px;
+}
+
+nav
+{
+	margin:5px;
+	width: 200px;
+	background-color:whitesmoke;
+}
+
+nav button
+{
+	margin:5px;
+}
