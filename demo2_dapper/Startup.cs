@@ -16,18 +16,7 @@ namespace Demo
 		{
 			//https://entityframeworkcore.com/knowledge-base/53150930/how-to-avoid-not-safe-context-operations-in-ef-core
 			services.AddControllers();
-			services.AddDbContext<Demo_Context>(ServiceLifetime.Transient);
 			//services.AddTransient<Demo_Context>();
-			
-			services
-				.AddGraphQLServer()
-				.AddType<User_Resolver>()
-				.AddType<Book_Resolver>()
-				.AddQueryType(d => d.Name("Query"))
-					.AddTypeExtension<User_Query>()
-					.AddTypeExtension<Book_Query>()
-				.AddMutationType(d => d.Name("Mutation"))
-					.AddTypeExtension<User_Mutation>();
 
 		}
 
@@ -39,7 +28,6 @@ namespace Demo
 				app.UseDeveloperExceptionPage();
 			}
 
-			DB.init(app);
 
 			/*
 			app.UseRouting();
@@ -60,7 +48,6 @@ namespace Demo
 				.UseRouting()
 				.UseEndpoints(endpoints =>
 				{
-					endpoints.MapGraphQL();
 					endpoints.MapDefaultControllerRoute();
 				});
 		}

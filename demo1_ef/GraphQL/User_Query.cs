@@ -38,12 +38,12 @@ namespace Demo
 	{
 		private readonly ILogger log = Log.ForContext<User_Query>();
 
-		public IQueryable<User> GetUsers([Service] Demo_Context context)
+		public IQueryable<User> users([Service] Demo_Context context)
 		{
 			return context.users;
 		}
 
-		public IQueryable<User> GetUserById([Service] Demo_Context context, [ID(nameof(User))]int id) 
+		public IQueryable<User> user_by_id([Service] Demo_Context context, [ID(nameof(User))]int id) 
 		{
 			return context.users.Where(u => u.id == id);
 		}

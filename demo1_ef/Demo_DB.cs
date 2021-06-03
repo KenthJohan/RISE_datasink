@@ -64,20 +64,38 @@ namespace Demo
 			{
 				var context = serviceScope.ServiceProvider.GetRequiredService<Demo_Context>();
 				//If all tables are dropped then they will be created here:
-				dropall(context);
+				//dropall(context);
 				//context.Database.ExecuteSqlRaw("DROP TABLE course_user_edges CASCADE");
+				var deleted = context.Database.EnsureDeleted();
 				var created = context.Database.EnsureCreated();
-				if (created)
-				{
-					Log.Information("Database created");
-				}
-				else
-				{
-					Log.Information("Database not created, already exist");
-				}
+				if (deleted){Log.Information("Database delted");}
+				else{Log.Information("Database not delted, does not exist");}
+				if (created){Log.Information("Database created");}
+				else{Log.Information("Database not created, already exist");}
 				//Testing.db_add_example(context);
 			}
 		}
+
+
+		public static void init1(Demo_Context context)
+		{
+			Log.Information("DB Init");
+			//If all tables are dropped then they will be created here:
+			//dropall(context);
+			//context.Database.ExecuteSqlRaw("DROP TABLE course_user_edges CASCADE");
+			var deleted = context.Database.EnsureDeleted();
+			var created = context.Database.EnsureCreated();
+			if (deleted){Log.Information("Database deleted");}
+			else{Log.Information("Database not deleted, does not exist");}
+			if (created){Log.Information("Database created");}
+			else{Log.Information("Database not created, already exist");}
+
+			context.config_hypertables();
+			context.add_test_data();
+
+			//Testing.db_add_example(context);
+		}
+
 
 
 	}

@@ -25,12 +25,12 @@ namespace Demo
 	public class Book_Query
 	{
 		private readonly ILogger log = Log.ForContext<User_Mutation>();
-		public IQueryable<Book> GetBooks([Service] Demo_Context context) 
+		public IQueryable<Book> books([Service] Demo_Context context) 
 		{
 			return context.books;
 		}
 
-		public IQueryable<Book> GetBookById([Service] Demo_Context context, [ID(nameof(Book))]int id) 
+		public IQueryable<Book> book_by_id([Service] Demo_Context context, [ID(nameof(Book))]int id) 
 		{
 			return context.books.Where(b => b.id == id);
 		}

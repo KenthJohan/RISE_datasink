@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Npgsql;
+using Microsoft.EntityFrameworkCore;
 
 namespace Demo
 {
@@ -30,12 +31,16 @@ namespace Demo
 		public static void Main(string[] args)
 		{
 			Log.Logger = new LoggerConfiguration()
-				.WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)
+				//.WriteTo.Console(theme: AnsiConsoleTheme.Code, applyThemeToRedirectedOutput: true)
+				.WriteTo.Console(applyThemeToRedirectedOutput: true)
 				.WriteTo.Demo_Sink()
 				.CreateBootstrapLogger();
 
 			test_psql();
-			
+
+			var optionsBuilder = new DbContextOptionsBuilder<Demo_Context>();
+			using var context = new Demo_Context(optionsBuilder.Options);
+			DB.init1(context);
 
 			CreateHostBuilder(args).Build().Run();
 

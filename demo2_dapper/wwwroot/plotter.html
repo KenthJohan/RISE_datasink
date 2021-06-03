@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<title></title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+	<script src='scripts.js'></script>
+</head>
+
+<body style="margin: 0px;">
+
+<div id="myDiv"></div>
+
+
+
+
+
+
+
+<script>
+
+var showthis = 
+{
+	//"miloatv_sensors": ["humidity", "timestamp", "temperature"]
+};
+
+if(window.location.hash)
+{
+	var h = window.location.hash.substring(1);
+	console.log(h);
+	var k = atob(decodeURIComponent(h));
+	console.log(k);
+	showthis = JSON.parse(k);
+	console.log(showthis);
+}
+else
+{
+  // Fragment doesn't exist
+}
+
+
+
+var client = mqtt.connect(mqtt_server_host);
+client.on('connect', function () 
+{
+	console.log("mqtt connected");
+});
+
+
+function newplotter(series)
+{
+	var traces = [];
+	var traceindex = 0;
+	var hastimestamp = false;
+
+	for (s in series)
+	{
+		var components = series[s].components;
+		for (component in components)
+		{
+			if (component == "timestamp")
+			{
+				hastimestamp = true;
+			}
+		}
+	}
+
+
+	for (s in series)
+	{
+		var components = series[s].components;
+		for (component in components)
+		{
+			let cell = components[component]._cell;
+			let quantity = components[component].quantity;
+			components[component]._traceindex = traceindex;
+			if (component != "timestamp")
+			{
+				traceindex++;
+				var trace = 
+				{
+					y: [],
+					mode: 'lines',
+					name: component,
+					line: {color: colors[quantity]}
+				};
+				if (hastimestamp)
+				{
+					trace.x = [];
+				}
+				traces.push(trace);
+			}
+		}
+	}
+	var layout = 
+	{
+		showlegend: true,
+		autosize: true,
+		title: 'Plot',
+  		font: {size: 18},
+		width:800
+	};
+	var config = {responsive: true}
+	//https://plotly.com/javascript/streaming/
+	Plotly.newPlot('myDiv', traces, layout,config);
+}
+
+
+
+
+
+req_json('api/series', (series) => 
+{
+	series_filter(series, showthis);
+	console.log("series", series);
+
+	newplotter(series);
+
+	
+	for (topic in series)
+	{
+		console.log("subscribe: " + topic);
+		client.subscribe(topic);
+	}
+
+
+	client.on("message", function (topic, payload)
+	{
+		var tracex = [];
+		var tracey = [];
+		var tracei = [];
+		var timestamp = null;
+		console.log(payload);
+		//console.log(fluff(payload));
+		//dataview = new DataView(fluff(payload).buffer);
+		var components = series[topic].components;
+		for (component in components)
+		{
+			//Warning! The payload does not start at byte 0!
+			dataview = new DataView(payload.buffer, payload.byteOffset + components[component].offset);
+			var s = converters[component](dataview);
+			if (component == "timestamp")
+			{
+				timestamp = s;
+			}
+			else
+			{
+				tracey.push([s]);
+				tracei.push(components[component]._traceindex);
+			}
+		}
+		if (timestamp != null)
+		{
+			for (let i = 0; i < tracei.length; i++)
+			{
+				tracex.push([timestamp]);
+			}
+		}
+		if (tracei.length > 0)
+		{
+			if (tracei.length == tracex.length)
+			{
+				//console.log(tracey, tracei);
+				Plotly.extendTraces('myDiv', {x:tracex, y: tracey}, tracei);
+			}
+			else
+			{
+				Plotly.extendTraces('myDiv', {y: tracey}, tracei);
+			}
+		}
+	});
+
+
+});
+
+
+
+</script>
+</body>
+</html>
