@@ -44,7 +44,7 @@ namespace Demo
 
 			User user = new User{email = email};
 			user.guid = Guid.NewGuid();
-			user.pwhash = PBKDF2.genhash(password, sn, pn, iterations);
+			user.pwhash = Password.salthash_create(password, sn, pn, iterations);
 
 			log.Information("Adding {@User}", user);
 			context.users.Add(user);
@@ -92,7 +92,7 @@ namespace Demo
 						.Build());
 			}
 			User user = context.users.FirstOrDefault(u => u.email == email);
-			bool success = PBKDF2.verify(user.pwhash, password, sn, pn, iterations);
+			bool success = Password.salthash_verify(password, user.pwhash, sn, pn, iterations);
 			if (success)
 			{
 				log.Information("The {@User} logged in: {success}", user, success);

@@ -17,6 +17,9 @@ namespace Demo
 
 		public static void Main(string[] args)
 		{
+			Password.assert_salthash();
+
+
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console(applyThemeToRedirectedOutput: true)
 				.WriteTo.Demo_Sink()
