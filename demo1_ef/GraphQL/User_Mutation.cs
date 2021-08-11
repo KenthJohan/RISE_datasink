@@ -19,6 +19,9 @@ namespace Demo
 	public class User_Mutation
 	{
 		private readonly ILogger log = Log.ForContext<User_Mutation>();
+		static private readonly int sn = 16;
+		static private readonly int pn = 20;
+		static private readonly int iterations = 100000;
 
 		public IQueryable<User> user_register([Service] Demo_Context context, string email, string password)
 		{
@@ -41,7 +44,7 @@ namespace Demo
 
 			User user = new User{email = email};
 			user.guid = Guid.NewGuid();
-			user.pwhash = PBKDF2.genhash(password, 16, 20, 100000);
+			user.pwhash = PBKDF2.genhash(password, sn, pn, iterations);
 
 			log.Information("Adding {@User}", user);
 			context.users.Add(user);
@@ -89,7 +92,7 @@ namespace Demo
 						.Build());
 			}
 			User user = context.users.FirstOrDefault(u => u.email == email);
-			bool success = PBKDF2.verify(user.pwhash, password, 16, 20, 100000);
+			bool success = PBKDF2.verify(user.pwhash, password, sn, pn, iterations);
 			if (success)
 			{
 				log.Information("The {@User} logged in: {success}", user, success);

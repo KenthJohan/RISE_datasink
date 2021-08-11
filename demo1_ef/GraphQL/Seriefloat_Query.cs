@@ -1,5 +1,6 @@
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 
 using Serilog;
@@ -9,6 +10,15 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
+
+using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
+using Npgsql;
 
 namespace Demo
 {
@@ -20,8 +30,9 @@ namespace Demo
 		{
 			return s.value * 20;
 		}
-
 	}
+
+
 
 
 	[ExtendObjectType("Query")]
@@ -36,6 +47,30 @@ namespace Demo
 		{
 			log.Information("Fetching seriefloats");
 			return context.seriefloats;
+		}
+
+		public List<float> seriefloats_column1([Service] Demo_Context context, int serie_id)
+		{
+			return context.seriefloats.Where(t => t.serie_id == serie_id).Select(t => t.value).ToList();
+		}
+		public int seriefloats_column2([Service] Demo_Context context, int serie_id)
+		{
+			NpgsqlConnection conn = new NpgsqlConnection(DB.npgsql_connection);
+			NpgsqlCommand com = new NpgsqlCommand("SELECT * from seriefloats", conn);
+			NpgsqlDataAdapter ad = new NpgsqlDataAdapter(com);
+			if(conn != null && conn.State == ConnectionState.Open){conn.Close();}
+			else{conn.Open();}
+			DataTable dt = new DataTable();
+			ad.Fill(dt);
+			NpgsqlDataReader dRead = com.ExecuteReader();
+			while (dRead.Read())
+			{
+				for(int i = 0; i < dRead.FieldCount; i++)
+				{
+					Console.Write("{0} \t \n", dRead[i].ToString());
+				}
+			}
+			return 0;
 		}
 
 /*

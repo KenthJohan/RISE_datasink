@@ -1,4 +1,14 @@
-function ws_url(postfix) {
+const assert = function(condition, message)
+{
+    if (condition === false)
+	{
+		throw Error('Assert failed: ' + (message || ''));
+	}
+};
+
+
+function ws_url(postfix)
+{
 	var scheme = document.location.protocol === "https:" ? "wss" : "ws";
 	var port = document.location.port ? (":" + document.location.port) : "";
 	var url = scheme + "://" + document.location.hostname + port + postfix;
@@ -109,4 +119,29 @@ function random_hsla2(seed)
 	var a = 'hsla(' + (r * 360) + ', 100%, 80%, 1)';
 	var b = 'hsla(' + (r * 180) + ', 100%, 80%, 1)';
 	return [a, b];
+}
+
+
+
+function make_request(q,onload)
+{
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", window.location.origin + "/graphql", true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onload = function ()
+	{
+		var r = JSON.parse(xhr.response);
+		if (r.data === null){return;}
+		if (onload != null)
+		{
+			console.log("request", q, "response", r.data);
+			onload(r.data);
+		}
+	};
+	xhr.onerror = function()
+	{
+		console.log("XHR unknown error. Probobly Cross-Origin Request Blocked");
+	}
+	var data = JSON.stringify({"query": q});
+	xhr.send(data);
 }

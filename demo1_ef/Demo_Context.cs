@@ -116,6 +116,7 @@ namespace Demo
 				new Project { id = 1, name = "Unknown" },
 				new Project { id = 2, name = "MiLo" },
 				new Project { id = 3, name = "Arena" },
+				new Project { id = 4, name = "Johan Home" },
 			};
 
 			List<Location> l = new List<Location>{
@@ -133,8 +134,8 @@ namespace Demo
 
 			List<Serie> t = new List<Serie>
 			{
-				new Serie{id = 1, name="My timeserie 1", location_id = 1, project_id = 1, quantity_id = 1, device_id = 1},
-				new Serie{id = 2, name="My timeserie 2", location_id = 1, project_id = 1, quantity_id = 1, device_id = 1},
+				new Serie{id = 1, name="My temperature serie", location_id = 2, project_id = 2, quantity_id = 2, device_id = 2},
+				new Serie{id = 2, name="My wind serie", location_id = 3, project_id = 4, quantity_id = 4, device_id = 3},
 			};
 
 			List<Seriefloat> v = new List<Seriefloat>
