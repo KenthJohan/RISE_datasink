@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 using System.Net.WebSockets;
 using Serilog;
@@ -50,7 +51,7 @@ namespace Demo
 
 
 		[HttpGet("/column")]
-		public IActionResult columns()
+		public IActionResult column()
 		{
 			string fields = "table_name,column_name,is_nullable,data_type,character_octet_length,udt_name,is_identity";
 			string db = Environment.GetEnvironmentVariable("POSTGRES_DB");
@@ -59,7 +60,22 @@ namespace Demo
 			return Content(HTML.create_table(t), "text/html");
 		}
 
-
+		[HttpGet("/test_npgsql_command")]
+		public IActionResult test_npgsql_command()
+		{
+			using var con = new NpgsqlConnection(DB.npgsql_connection);
+			con.Open();
+			using var cmd = new NpgsqlCommand("SELECT value from @colname where serie_id = @serie_id", con);
+			cmd.Parameters.AddWithValue("serie_id", 1);
+			cmd.Parameters.AddWithValue("colname", "seriefloat");
+			//cmd.Prepare();
+			using NpgsqlDataReader rdr = cmd.ExecuteReader();
+			while (rdr.Read())
+			{
+				Console.WriteLine("{0}", rdr.GetFloat(0));
+			}
+			return Content("paratest", "text/html");
+		}
 
 
 
@@ -75,7 +91,7 @@ namespace Demo
 			*/
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Demo_Sink.accept_ws(c);
+				await Serilog_Websocket_Sink.accept_ws(c);
 			}
 			else
 			{

@@ -18,20 +18,20 @@ using Serilog.Events;
 
 namespace Demo
 {
-	public class Demo_Sink : ILogEventSink
+	public class Serilog_Websocket_Sink : ILogEventSink
 	{
 		IFormatProvider p;
 		public static List<WebSocket> wss { get; set; } = new List<WebSocket>();
 		static readonly JsonValueFormatter f = new JsonValueFormatter("$type");
 		
 		
-		private static readonly ILogger log = Log.ForContext(typeof(Demo_Sink));
+		private static readonly ILogger log = Log.ForContext(typeof(Serilog_Websocket_Sink));
 
 		public static async Task accept_ws(HttpContext context)
 		{
 			WebSocket ws = await context.WebSockets.AcceptWebSocketAsync();
 			wss.Add(ws);
-			log.Information("Adding new websocket {ws} to list. Websockets count {count}", ws.GetHashCode(), Demo_Sink.wss.Count);
+			log.Information("Adding new websocket {ws} to list. Websockets count {count}", ws.GetHashCode(), Serilog_Websocket_Sink.wss.Count);
 			var buffer = new byte[1024 * 4];
 			WebSocketReceiveResult result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 			while (!result.CloseStatus.HasValue)
@@ -61,7 +61,7 @@ namespace Demo
 			t.Start();
 		}
 
-		public Demo_Sink(IFormatProvider p)
+		public Serilog_Websocket_Sink(IFormatProvider p)
 		{
 			this.p = p;
 		}
@@ -98,7 +98,7 @@ namespace Demo
 	{
 		public static LoggerConfiguration Demo_Sink(this LoggerSinkConfiguration c, IFormatProvider p = null)
 		{
-			return c.Sink(new Demo_Sink(p));
+			return c.Sink(new Serilog_Websocket_Sink(p));
 		}
 	}
 }

@@ -123,7 +123,7 @@ function random_hsla2(seed)
 
 
 
-function make_request(q,onload)
+function gql_request(q, onload)
 {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", window.location.origin + "/graphql", true);
@@ -144,4 +144,11 @@ function make_request(q,onload)
 	}
 	var data = JSON.stringify({"query": q});
 	xhr.send(data);
+}
+
+
+
+function gql_floatval_add(value, onload)
+{
+	gql_request("mutation{floatval_add(value:"+value+")}", onload);
 }

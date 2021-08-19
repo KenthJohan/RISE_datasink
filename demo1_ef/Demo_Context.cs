@@ -34,12 +34,12 @@ namespace Demo
 
 		public DbSet<User> users { get; set; }
 		public DbSet<Book> books { get; set; }
-		public DbSet<Seriefloat> seriefloats { get; set; }
+		public DbSet<Floatval> floatvals { get; set; }
 		public DbSet<Quantity> quantities { get; set; }
 		public DbSet<Location> locations { get; set; }
 		public DbSet<Device> devices { get; set; }
 		public DbSet<Project> projects { get; set; }
-		public DbSet<Serie> series { get; set; }
+		public DbSet<Producer> producers { get; set; }
 
 
 		public Demo_Context(ILoggerFactory loggerFactory, DbContextOptions<Demo_Context> options)
@@ -58,32 +58,13 @@ namespace Demo
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			builder.Entity<User>().HasIndex(u => u.email).IsUnique();
-
-			builder.Entity<User>()
-				.HasMany(t => t.books)
-				.WithOne(t => t.author)
-				.HasForeignKey(t => t.author_id);
-
-			//builder.Entity<Sensorvalue>().HasOne(t => t.timeserie).WithMany(t => t.sensorvalues);
-			//builder.Entity<Timeserie>().HasOne(t => t.device).WithMany(t => t.timeseries);
-
-			builder.Entity<Serie>().HasMany(t => t.seriefloats).WithOne(t => t.serie).HasForeignKey(t => t.serie_id);
-			builder.Entity<Device>().HasMany(t => t.series).WithOne(t => t.device).HasForeignKey(t => t.device_id);
-			builder.Entity<Project>().HasMany(t => t.series).WithOne(t => t.project).HasForeignKey(t => t.project_id);
-			builder.Entity<Quantity>().HasMany(t => t.series).WithOne(t => t.quantity).HasForeignKey(t => t.quantity_id);
-			builder.Entity<Location>().HasMany(t => t.series).WithOne(t => t.location).HasForeignKey(t => t.location_id);
-
-
-			builder.Entity<Seriefloat>().HasKey(u => new
-			{
-				u.time,
-				u.serie_id
-			});
-
-
-
-
-
+			builder.Entity<User>().HasMany(t => t.books).WithOne(t => t.author).HasForeignKey(t => t.author_id);
+			builder.Entity<Device>().HasMany(t => t.producer).WithOne(t => t.device).HasForeignKey(t => t.device_id);
+			builder.Entity<Project>().HasMany(t => t.producer).WithOne(t => t.project).HasForeignKey(t => t.project_id);
+			builder.Entity<Quantity>().HasMany(t => t.producer).WithOne(t => t.quantity).HasForeignKey(t => t.quantity_id);
+			builder.Entity<Location>().HasMany(t => t.producer).WithOne(t => t.location).HasForeignKey(t => t.location_id);
+			builder.Entity<Producer>().HasMany(t => t.floatvals).WithOne(t => t.producer).HasForeignKey(t => t.producer_id);
+			builder.Entity<Floatval>().HasKey(u => new{u.time,u.producer_id});
 		}
 	}
 
@@ -95,9 +76,10 @@ namespace Demo
 			int r;
 			r = context.Database.ExecuteSqlRaw($"CREATE EXTENSION IF NOT EXISTS timescaledb;");
 			Log.Information("CREATE timescaledb {r}", r);
-			r = context.Database.ExecuteSqlRaw($"SELECT create_hypertable('seriefloats', 'time', 'serie_id', 1);");
-			//r = context.Database.ExecuteSqlRaw($"SELECT create_distributed_hypertable('sensorvalues', 'time', 'device_id');");
+			r = context.Database.ExecuteSqlRaw($"SELECT create_hypertable('floatvals', 'time');");
 			Log.Information("create_hypertable {r}", r);
+			r = context.Database.ExecuteSqlRaw($"SELECT add_dimension('floatvals', 'producer_id', number_partitions => 4);");
+			Log.Information("add_dimension {r}", r);
 		}
 
 
@@ -132,27 +114,32 @@ namespace Demo
 				new Quantity { id = 4, name = "Wind" },
 			};
 
-			List<Serie> t = new List<Serie>
 			{
-				new Serie{id = 1, name="My temperature serie", location_id = 2, project_id = 2, quantity_id = 2, device_id = 2},
-				new Serie{id = 2, name="My wind serie", location_id = 3, project_id = 4, quantity_id = 4, device_id = 3},
-			};
+				List<Producer> producers = new List<Producer>
+				{
+					new Producer { id = 1, name = "Unknown" },
+					new Producer { id = 2, name = "Temperature" },
+					new Producer { id = 3, name = "Humidity" },
+					new Producer { id = 4, name = "Wind" },
+				};
+				context.producers.AddRange(producers);
+			}
+			//humidity, barometric pressure and ambient temperature
 
-			List<Seriefloat> v = new List<Seriefloat>
+			List<Floatval> v = new List<Floatval>
 			{
-				new Seriefloat { time = DateTime.Now.AddMilliseconds(1), value = 1.2f, serie_id = 1 },
-				new Seriefloat { time = DateTime.Now.AddMilliseconds(2), value = 1.3f, serie_id = 1 },
-				new Seriefloat { time = DateTime.Now.AddMilliseconds(3), value = 1.4f, serie_id = 1 },
-				new Seriefloat { time = DateTime.Now.AddMilliseconds(4), value = 1.5f, serie_id = 1 },
-				new Seriefloat { time = DateTime.Now.AddMilliseconds(5), value = 1.6f, serie_id = 1 }
+				new Floatval { time = DateTime.Now.AddMilliseconds(1), value = 1.2f},
+				new Floatval { time = DateTime.Now.AddMilliseconds(2), value = 1.3f},
+				new Floatval { time = DateTime.Now.AddMilliseconds(3), value = 1.4f},
+				new Floatval { time = DateTime.Now.AddMilliseconds(4), value = 1.5f},
+				new Floatval { time = DateTime.Now.AddMilliseconds(5), value = 1.6f}
 			};
 
 			context.devices.AddRange(d);
 			context.projects.AddRange(p);
 			context.locations.AddRange(l);
 			context.quantities.AddRange(q);
-			context.series.AddRange(t);
-			context.seriefloats.AddRange(v);
+			context.floatvals.AddRange(v);
 
 			int r = context.SaveChanges();
 			Log.Information("SaveChanges {r}", r);

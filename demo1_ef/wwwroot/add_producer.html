@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Add new producer</title>
+<link rel="stylesheet" type="text/css" href="arena.css"/>
+<style>
+
+</style>
+</head>
+<body>
+
+
+<h1>Add new producer</h1>
+
+<form graphql="producer_add">
+<p>
+	<label for="name">name</label><br>
+	<input type="string" name="name">
+</p>
+<p>
+	<label for="quantity">quantity</label><br>
+	<input type="string" name="quantity" graphql_list="options:quantities{value_id:id value:name}">
+</p>
+<p><input type="submit"></p>
+<p><output name="log"></output></p>
+</form>
+
+
+<script src='basic.js'></script>
+<script src='add.js'></script>
+</body>
+</html>
+
+

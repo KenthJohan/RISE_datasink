@@ -4,7 +4,7 @@ function html_seriefloats(data)
 	var element_title = document.createElement('h2');
 	element_title.textContent = "Seriefloats";
 	element.appendChild(element_title);
-	element.appendChild(html_seriefloats_table(data.seriefloats));
+	element.appendChild(html_seriefloats_table(data.floatvals));
 	return element;
 }
 

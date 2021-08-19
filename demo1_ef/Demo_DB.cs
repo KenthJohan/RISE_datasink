@@ -99,7 +99,7 @@ namespace Demo
 		{
 			log.Information("NpgsqlConnection {s}", npgsql_connection);
 			NpgsqlConnection conn = new NpgsqlConnection(npgsql_connection); 
-			conn.Open(); 
+			conn.Open();
 			if (conn.State == System.Data.ConnectionState.Open)
 			{
 				log.Information("Success open postgreSQL connection. {@ConnectionState}", conn.State); 

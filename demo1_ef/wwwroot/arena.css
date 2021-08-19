@@ -1,3 +1,24 @@
+input
+{
+	width: 400px;
+}
+
+input:invalid
+{
+	border: 2px dashed red;
+}
+
+legend
+{
+    padding: 3px 6px;
+}
+
+
+body
+{
+	/*font: 1rem 'Fira Sans', sans-serif;*/
+}
+
 table
 {
 	/*margin:20px;*/
@@ -121,3 +142,4 @@ nav button
 {
 	margin:5px;
 }
+

@@ -21,7 +21,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{series{id name device{name} location{name} project{name} quantity{name}}}", (x)=>{
+			gql_request("query{series{id name device{name} location{name} project{name} quantity{name}}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_series(x));
@@ -36,7 +36,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{devices{id name}}", (x)=>{
+			gql_request("query{devices{id name}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_devices(x));
@@ -51,7 +51,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{projects{id name}}", (x)=>{
+			gql_request("query{projects{id name}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_projects(x));
@@ -67,7 +67,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{locations{id name}}", (x)=>{
+			gql_request("query{locations{id name}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_locations(x));
@@ -83,7 +83,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{quantities{id name}}", (x)=>{
+			gql_request("query{quantities{id name}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_quantities(x));
@@ -99,7 +99,7 @@ function hashchange()
 		}
 		else
 		{
-			make_request("query{seriefloats{time value}}", (x)=>{
+			gql_request("query{floatvals{time value}}", (x)=>{
 				//let data = [{column1:"Bananas"},{column1:"Kiwi"}];
 				element_main.innerHTML = "";
 				element_main.appendChild(html_seriefloats(x));

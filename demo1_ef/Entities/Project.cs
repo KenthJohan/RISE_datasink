@@ -10,6 +10,6 @@ namespace Demo
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int id { get; set; }
 		public string name { get; set; }
-		public ICollection<Serie> series { get; set; }
+		public ICollection<Producer> producer { get; set; }
 	}
 }
