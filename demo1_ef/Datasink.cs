@@ -22,7 +22,7 @@ namespace Demo
 	public static class Datasink
 	{
 		private static readonly ILogger log = Log.ForContext(typeof(Datasink));
-		public static List<WebSocket> socks { get; set; } = new List<WebSocket>();
+		public static Dictionary<int, List<WebSocket>> socks = new Dictionary<int, List<WebSocket>>();
 
 
 
@@ -33,16 +33,20 @@ namespace Demo
 			sock.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
 		}
 
+
+		//High frequency function.
+		//This must be perfomant.
 		public static void add(Demo_Context context, Floatval state)
 		{
 			context.floatvals.Add(state);
 			context.SaveChanges();
-			log.Information("Added new value {@Floatval}", state);
-			foreach (WebSocket sock in socks)
+			log.Information("Producer {producer_id} adds value {@Floatval}", state.producer_id, state);
+			foreach (WebSocket sock in socks[state.producer_id])
 			{
 				switch(sock.State)
 				{
 					case WebSocketState.Open:
+						//TODO: Send binary values instead of json:
 						string json = JsonSerializer.Serialize(state);
 						send(sock, json, WebSocketMessageType.Text, true, CancellationToken.None);
 						break;
@@ -55,6 +59,30 @@ namespace Demo
 				}
 			}
 		}
+
+
+		public static async Task accept(int producer_id, WebSocket ws)
+		{
+			if (socks.ContainsKey(producer_id) == false)
+			{
+				socks[producer_id] = new List<WebSocket>{};
+			}
+			socks[producer_id].Add(ws);
+			log.Information("Adding new websocket {ws} to list {producer_id}. Websockets count {count}", ws.GetHashCode(), producer_id, socks[producer_id].Count);
+			var buffer = new byte[1024 * 4];
+			WebSocketReceiveResult result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+			while (!result.CloseStatus.HasValue)
+			{
+				log.Information("WebSocket {ws} loop. WebSocket count {count}", ws.GetHashCode(), socks[producer_id].Count);
+				//Echo websocket message:
+				await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+				result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+			}
+			await ws.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+			socks[producer_id].Remove(ws);
+			log.Information("WebSocket {ws} closed. WebSocket count {count}", ws.GetHashCode(), socks[producer_id].Count);
+		}
+
 
 	};
 }

@@ -3,15 +3,6 @@ function submit_callback(event)
 	event.preventDefault();
 	var query = "mutation{" + event.srcElement.getAttribute("graphql") + "(";
 
-	const graphql_lists = event.srcElement.querySelectorAll('input[graphql_list]');
-	for (i = 0; i < graphql_lists.length; ++i)
-	{
-		const datalist = event.srcElement.querySelector("#"+graphql_lists[i].getAttribute("list"));
-		var op = datalist.querySelector('[value="'+graphql_lists[i].value+'"]');
-		console.log(op);
-		graphql_lists[i].value = op.getAttribute("value_id");
-	}
-
 	{
 		const data = new FormData(event.srcElement)
 		console.log(data);
@@ -50,11 +41,11 @@ function submit_callback(event)
 
 
 {
-	const forms = document.querySelectorAll('form[graphql]');
+	const elements_form = document.querySelectorAll('form[graphql]');
 	//console.log(forms);
-	for (i = 0; i < forms.length; ++i)
+	for (i = 0; i < elements_form.length; ++i)
 	{
-		forms[i].addEventListener('submit', submit_callback);
+		elements_form[i].addEventListener('submit', submit_callback);
 	}
 }
 
@@ -62,14 +53,14 @@ function submit_callback(event)
 
 
 {
-	const inputs = document.querySelectorAll('input[type="datetime-local"][now]');
+	const elements_input = document.querySelectorAll('input[type="datetime-local"][now]');
 	//console.log(inputs);
-	for (i = 0; i < inputs.length; ++i)
+	for (i = 0; i < elements_input.length; ++i)
 	{
 		const now = new Date();
 		now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
 		//now.setMilliseconds(null);
-		inputs[i].value = now.toISOString();
+		elements_input[i].value = now.toISOString();
 	}
 }
 
@@ -92,16 +83,19 @@ function submit_callback(event)
 
 
 {
-	const inputs = document.querySelectorAll('input[graphql_list]');
-	console.log(inputs);
-	for (i = 0; i < inputs.length; ++i)
+	let elements_options = document.querySelectorAll('select[graphql_option]');
+	let elements_options1 = {};
+	let query = "query{\n";
+	for (let i = 0; i < elements_options.length; ++i)
 	{
-		var datalist_id_name = "datalist_" + inputs[i].getAttribute("name");
-		const query = "query{"+inputs[i].getAttribute("graphql_list")+"}";
-		datalist = document.createElement('datalist');
-		datalist.setAttribute("id", datalist_id_name);
-		inputs[i].setAttribute("list", datalist_id_name);
-
+		const name = elements_options[i].getAttribute("name");
+		const q = elements_options[i].getAttribute("graphql_option");
+		elements_options1[name] = elements_options[i];
+		query += name+":"+q+"\n";
+	}
+	query += "}";
+	//console.log(elements_options1, query);
+	{
 		var xhr = new XMLHttpRequest();
 		xhr.open("POST", window.location.origin + "/graphql", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
@@ -109,13 +103,16 @@ function submit_callback(event)
 		{
 			var r = JSON.parse(xhr.response);
 			if (r.data === null){return;}
-			var options = r.data.options;
-			for (j = 0; j < options.length; ++j)
+			for (const property in r.data)
 			{
-				option = document.createElement('option');
-				option.setAttribute("value", options[j].value);
-				option.setAttribute("value_id", options[j].value_id);
-				datalist.appendChild(option);
+				//console.log(property, r.data[property]);
+				for (i = 0; i < r.data[property].length; ++i)
+				{
+					var element_option = document.createElement('option');
+					element_option.value = r.data[property][i].value;
+					element_option.textContent = r.data[property][i].name + (r.data[property][i].name1 ? " (" + r.data[property][i].name1 + ")" : "");
+					elements_options1[property].appendChild(element_option);
+				}
 			}
 		};
 		xhr.onerror = function()
@@ -124,10 +121,6 @@ function submit_callback(event)
 		}
 		var data = JSON.stringify({"query": query});
 		xhr.send(data);
-
-
-		
-		inputs[i].parentNode.insertBefore(datalist, inputs[i].nextSibling);
 	}
 }
 

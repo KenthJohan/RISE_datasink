@@ -86,60 +86,89 @@ namespace Demo
 		
 		public static void add_test_data(this Demo_Context context)
 		{
-			List<Device> d = new List<Device>{
-				new Device { id = 1, name = "Unknown" },
-				new Device { id = 2, name = "BME280" },
-				new Device { id = 3, name = "BME280" },
-				new Device { id = 4, name = "BME280" },
-				new Device { id = 5, name = "BME280" }
-			};
-
-			List<Project> p = new List<Project>{
-				new Project { id = 1, name = "Unknown" },
-				new Project { id = 2, name = "MiLo" },
-				new Project { id = 3, name = "Arena" },
-				new Project { id = 4, name = "Johan Home" },
-			};
-
-			List<Location> l = new List<Location>{
-				new Location { id = 1, name = "Unknown" },
-				new Location { id = 2, name = "MiLo ATV" },
-				new Location { id = 3, name = "Johan home" },
-			};
-
-			List<Quantity> q = new List<Quantity>{
-				new Quantity { id = 1, name = "Unknown" },
-				new Quantity { id = 2, name = "Temperature" },
-				new Quantity { id = 3, name = "Humidity" },
-				new Quantity { id = 4, name = "Wind" },
-			};
+			{
+				List<Device> records = new List<Device>
+				{
+					new Device { id = 1, name = "Unknown" },
+					new Device { id = 2, name = "BME280" },
+					new Device { id = 3, name = "BME280" },
+					new Device { id = 4, name = "BME280" },
+					new Device { id = 5, name = "BME280" }
+				};
+				context.devices.AddRange(records);
+			}
 
 			{
-				List<Producer> producers = new List<Producer>
+				List<Project> records = new List<Project>
 				{
-					new Producer { id = 1, name = "Unknown" },
-					new Producer { id = 2, name = "Temperature" },
-					new Producer { id = 3, name = "Humidity" },
-					new Producer { id = 4, name = "Wind" },
+					new Project { id = 1, name = "Unknown" },
+					new Project { id = 2, name = "MiLo" },
+					new Project { id = 3, name = "Arena" },
+					new Project { id = 4, name = "Johan Home" },
 				};
-				context.producers.AddRange(producers);
+				context.projects.AddRange(records);
+			}
+
+			{
+				List<Location> records = new List<Location>
+				{
+					new Location { id = 1, name = "Unknown" },
+					new Location { id = 2, name = "MiLo ATV" },
+					new Location { id = 3, name = "Johan home" },
+				};
+				context.locations.AddRange(records);
+			}
+
+			{
+				List<Quantity> records = new List<Quantity>
+				{
+					new Quantity { id = 1, name = "Unknown" },
+					new Quantity { id = 2, name = "Temperature" },
+					new Quantity { id = 3, name = "Humidity" },
+					new Quantity { id = 4, name = "Wind" },
+					new Quantity { id = 5, name = "Pressure" },
+					new Quantity { id = 6, name = "Force" },
+					new Quantity { id = 7, name = "Current" },
+					new Quantity { id = 8, name = "Power" },
+					new Quantity { id = 9, name = "Voltage" },
+				};
+				context.quantities.AddRange(records);
+			}
+
+
+			{
+				List<Producer> records = new List<Producer>
+				{
+					new Producer { id = 1, name = "Unknown", quantity_id = 1 },
+					new Producer { id = 2, name = "Producer 2", quantity_id = 2 },
+					new Producer { id = 3, name = "Producer 3", quantity_id = 3 },
+					new Producer { id = 4, name = "Producer 4", quantity_id = 4 },
+					new Producer { id = 5, name = "Producer 5", quantity_id = 5 },
+					new Producer { id = 6, name = "Producer 6", quantity_id = 6 },
+					new Producer { id = 7, name = "Producer 7", quantity_id = 7 },
+					new Producer { id = 8, name = "Producer 8", quantity_id = 8 },
+					new Producer { id = 9, name = "Producer 9", quantity_id = 9 },
+					new Producer { id = 10, name = "Producer 10", quantity_id = 9 },
+					new Producer { id = 11, name = "Producer 11", quantity_id = 4 },
+					new Producer { id = 12, name = "Producer 12", quantity_id = 4 },
+				};
+				context.producers.AddRange(records);
 			}
 			//humidity, barometric pressure and ambient temperature
 
-			List<Floatval> v = new List<Floatval>
 			{
-				new Floatval { time = DateTime.Now.AddMilliseconds(1), value = 1.2f},
-				new Floatval { time = DateTime.Now.AddMilliseconds(2), value = 1.3f},
-				new Floatval { time = DateTime.Now.AddMilliseconds(3), value = 1.4f},
-				new Floatval { time = DateTime.Now.AddMilliseconds(4), value = 1.5f},
-				new Floatval { time = DateTime.Now.AddMilliseconds(5), value = 1.6f}
-			};
+				List<Floatval> records = new List<Floatval>
+				{
+					new Floatval { time = DateTime.Now.AddMilliseconds(1), value = 1.2f},
+					new Floatval { time = DateTime.Now.AddMilliseconds(2), value = 1.3f},
+					new Floatval { time = DateTime.Now.AddMilliseconds(3), value = 1.4f},
+					new Floatval { time = DateTime.Now.AddMilliseconds(4), value = 1.5f},
+					new Floatval { time = DateTime.Now.AddMilliseconds(5), value = 1.6f}
+				};
+				context.floatvals.AddRange(records);
+			}
 
-			context.devices.AddRange(d);
-			context.projects.AddRange(p);
-			context.locations.AddRange(l);
-			context.quantities.AddRange(q);
-			context.floatvals.AddRange(v);
+
 
 			int r = context.SaveChanges();
 			Log.Information("SaveChanges {r}", r);

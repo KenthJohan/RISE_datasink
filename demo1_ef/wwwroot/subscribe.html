@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Subscribe</title>
+<link rel="stylesheet" type="text/css" href="arena.css"/>
+<style>
+
+</style>
+</head>
+<body>
+
+
+<h1>Subscribe</h1>
+
+<form id="form">
+	<p>
+		<label for="producer_id">Producer</label><br>
+		<select name="producer_id" graphql_option="producers{value:id name:name name1:quantity_name quantity_id}"></select>
+	</p>
+	<p><input type="submit"></p>
+</form>
+
+<output id="out"></output>
+
+
+<script src='basic.js'></script>
+<script src='add.js'></script>
+<script>
+
+var element_output = document.getElementById("out");
+var element_form = document.getElementById("form");
+
+function ws_connect(url)
+{
+	console.log("WebSocket: ", url);
+	socket = new WebSocket(url);
+	socket.onopen = function (event)
+	{
+		console.log(event);
+	};
+	socket.onclose = function (event)
+	{
+		console.log(event);
+	};
+	socket.onerror = function (event)
+	{
+		console.log(event);
+		element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
+	};
+	socket.onmessage = function (event)
+	{
+		var row = JSON.parse(event.data);
+		console.log(row);
+		element_output.innerText += event.data + "\n";
+	};
+};
+
+
+element_form.onsubmit = (event) =>
+{
+	var url = ws_url("/subscribe/"+event.target.producer_id.value);
+	ws_connect(url);
+	event.preventDefault();
+}
+
+</script>
+</body>
+</html>
+
+

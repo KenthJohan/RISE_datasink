@@ -105,7 +105,20 @@ namespace Demo
 
 
 
-
+		[HttpGet("/subscribe/{producer_id}")]
+		public async Task subscribe_producer(int producer_id)
+		{
+			var c = ControllerContext.HttpContext;
+			if (c.WebSockets.IsWebSocketRequest)
+			{
+				await Datasink.accept(producer_id, await c.WebSockets.AcceptWebSocketAsync());
+			}
+			else
+			{
+				c.Response.StatusCode = 400;
+				await c.Response.WriteAsync("WebSocket does not work :(");
+			}
+		}
 
 
 

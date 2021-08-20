@@ -19,9 +19,11 @@
 	<input type="number" name="value" value="1.4" step="any">
 </p>
 <p>
-	<label for="producer_id">producer_id</label><br>
-	<input type="number" name="producer_id" value="1" min="0" step="1">
+	<label for="producer_id">Producer</label><br>
+	<select name="producer_id" graphql_option="producers{value:id name:name}"></select>
 </p>
+
+
 <p><input type="submit"></p>
 <p><output name="log"></output></p>
 </form>

@@ -20,7 +20,19 @@
 </p>
 <p>
 	<label for="quantity">quantity</label><br>
-	<input type="string" name="quantity" graphql_list="options:quantities{value_id:id value:name}">
+	<select name="quantity" graphql_option="quantities{value:id name:name}"></select>
+</p>
+<p>
+	<label for="device">device</label><br>
+	<select name="device" graphql_option="devices{value:id name:name}"></select>
+</p>
+<p>
+	<label for="project">project</label><br>
+	<select name="project" graphql_option="projects{value:id name:name}"></select>
+</p>
+<p>
+	<label for="location">location</label><br>
+	<select name="location" graphql_option="locations{value:id name:name}"></select>
 </p>
 <p><input type="submit"></p>
 <p><output name="log"></output></p>
