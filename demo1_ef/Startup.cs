@@ -19,28 +19,7 @@ namespace Demo
 			services.AddDbContext<Demo_Context>(ServiceLifetime.Transient);
 			services.AddHttpContextAccessor();
 			//services.AddTransient<Demo_Context>();
-			
-			services
-				.AddGraphQLServer()
-				.AddType<User_Resolver>()
-				.AddType<Book_Resolver>()
-				.AddType<Seriefloat_Resolver>()
-				.AddType<Producer_Resolver>()
-				.AddQueryType(d => d.Name("Query"))
-					.AddTypeExtension<User_Query>()
-					.AddTypeExtension<Book_Query>()
-					.AddTypeExtension<Floatval_Query>()
-					.AddTypeExtension<Device_Query>()
-					.AddTypeExtension<Location_Query>()
-					.AddTypeExtension<Project_Query>()
-					.AddTypeExtension<Quantity_Query>()
-					.AddTypeExtension<Producer_Query>()
-				.AddMutationType(d => d.Name("Mutation"))
-					.AddTypeExtension<User_Mutation>()
-					.AddTypeExtension<Floatval_Mutation>()
-				.AddProjections()
-				.AddFiltering()
-				.AddSorting();
+			GraphQL_Services.init(services);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

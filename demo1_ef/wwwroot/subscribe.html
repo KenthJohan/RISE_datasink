@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <title>Subscribe</title>
 <link rel="stylesheet" type="text/css" href="arena.css"/>
+<script src="https://cdn.plot.ly/plotly-2.3.1.min.js"></script>
 <style>
 
 </style>
@@ -21,20 +22,50 @@
 	<p><input type="submit"></p>
 </form>
 
-<output id="out"></output>
+<div id="plot"></div>
 
 
 <script src='basic.js'></script>
 <script src='add.js'></script>
 <script>
+	//https://plotly.com/javascript/streaming/
+function rand() {
+return Math.random();
+}
+
+Plotly.newPlot('plot', [{
+	x: [1,2,3].map(rand),
+	y: [1,2,3].map(rand),
+	mode: 'lines',
+	line: {color: '#80CAF6'}
+}]);
+
+/*
+var cnt = 0;
+var interval = setInterval(function()
+{
+	Plotly.extendTraces('plot', {
+	x: [[rand()]],
+	y: [[rand()]]
+	}, [0])
+	if(++cnt === 100) clearInterval(interval);
+}, 300);
+*/
+
+
+
+
 
 var element_output = document.getElementById("out");
 var element_form = document.getElementById("form");
 
-function ws_connect(url)
+
+function ws_connect(producer_id)
 {
+	var url = ws_url("/subscribe_ws");
 	console.log("WebSocket: ", url);
 	socket = new WebSocket(url);
+	socket.binaryType = "arraybuffer";
 	socket.onopen = function (event)
 	{
 		console.log(event);
@@ -50,17 +81,24 @@ function ws_connect(url)
 	};
 	socket.onmessage = function (event)
 	{
-		var row = JSON.parse(event.data);
-		console.log(row);
-		element_output.innerText += event.data + "\n";
+		const view = new DataView(event.data);
+		console.log(buf2hex(event.data), view.getUint32(0, true), view.getBigInt64(4, true), view.getFloat32(12, true));
+		console.log(new Date(Number(view.getBigInt64(4, true))));
+		/*
+		Plotly.extendTraces('plot', {
+			x: [[rand()]],
+			y: [[rand()]]
+		}, [0]);
+		*/
 	};
 };
 
 
+
+
 element_form.onsubmit = (event) =>
 {
-	var url = ws_url("/subscribe/"+event.target.producer_id.value);
-	ws_connect(url);
+	ws_connect(event.target.producer_id.value);
 	event.preventDefault();
 }
 

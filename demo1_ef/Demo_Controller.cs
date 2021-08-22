@@ -105,13 +105,13 @@ namespace Demo
 
 
 
-		[HttpGet("/subscribe/{producer_id}")]
-		public async Task subscribe_producer(int producer_id)
+		[HttpGet("/subscribe_ws")]
+		public async Task subscribe_ws(int producer_id)
 		{
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Datasink.accept(producer_id, await c.WebSockets.AcceptWebSocketAsync());
+				await Datasink.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{

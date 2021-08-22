@@ -16,13 +16,50 @@ using Serilog.Core;
 using Serilog.Events;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Demo
 {
+
+	[StructLayout(LayoutKind.Explicit, Pack = 1)]
+	public unsafe struct Float_Message
+	{
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+		[FieldOffset(0)]
+		public fixed byte data[16];
+		[FieldOffset(0)] public Int32 producer_id;
+		[FieldOffset(4)] public Int64 time;
+		[FieldOffset(12)] public float value;
+		public unsafe static byte[] GetBytes(Float_Message value)
+		{
+			byte[] arr = new byte[16];
+			Marshal.Copy((IntPtr)value.data, arr, 0, 16);
+			return arr;
+		}
+		public ArraySegment<byte> GetArraySegment()
+		{
+			return new ArraySegment<byte>(Float_Message.GetBytes(this));
+		}
+	}
+
+	//https://stackoverflow.com/questions/2404247/datetime-to-javascript-date
+	public static class DateTimeJavaScript
+	{
+		private static readonly long DatetimeMinTimeTicks =
+		   (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Ticks;
+
+		public static long ToJavaScriptMilliseconds(this DateTime dt)
+		{
+			return (long)((dt.ToUniversalTime().Ticks - DatetimeMinTimeTicks) / 10000);
+		}
+	}
+
+
 	public static class Datasink
 	{
 		private static readonly ILogger log = Log.ForContext(typeof(Datasink));
-		public static Dictionary<int, List<WebSocket>> socks = new Dictionary<int, List<WebSocket>>();
+		public static Dictionary<WebSocket, HashSet<int>> subscriptions = new Dictionary<WebSocket, HashSet<int>>();
 
 
 
@@ -41,14 +78,28 @@ namespace Demo
 			context.floatvals.Add(state);
 			context.SaveChanges();
 			log.Information("Producer {producer_id} adds value {@Floatval}", state.producer_id, state);
-			foreach (WebSocket sock in socks[state.producer_id])
+			foreach (WebSocket sock in subscriptions.Keys)
 			{
-				switch(sock.State)
+				switch (sock.State)
 				{
 					case WebSocketState.Open:
-						//TODO: Send binary values instead of json:
-						string json = JsonSerializer.Serialize(state);
-						send(sock, json, WebSocketMessageType.Text, true, CancellationToken.None);
+						//Should be O(1):
+						if (subscriptions[sock].Contains(state.producer_id))
+						{
+							Float_Message message = new Float_Message { };
+							message.producer_id = state.producer_id;
+							//message.time = state.time.ToBinary();
+							message.time = DateTimeJavaScript.ToJavaScriptMilliseconds(state.time);
+							message.value = state.value;
+							sock.SendAsync(message.GetArraySegment(), WebSocketMessageType.Binary, true, CancellationToken.None);
+							//string json = JsonSerializer.Serialize(state);
+							//send(sock, json, WebSocketMessageType.Text, true, CancellationToken.None);
+							subscriptions[sock].Remove(state.producer_id);
+						}
+						else
+						{
+							subscriptions[sock].Add(state.producer_id);
+						}
 						break;
 					case WebSocketState.Closed:
 						log.Information("ws Closed");
@@ -61,26 +112,24 @@ namespace Demo
 		}
 
 
-		public static async Task accept(int producer_id, WebSocket ws)
+		//https://csharp.hotexamples.com/examples/System.Net.WebSockets/WebSocket/ReceiveAsync/php-websocket-receiveasync-method-examples.html
+		//https://csharp.hotexamples.com/site/file?hash=0xf067416689828e386db477c574790970910f8d1e74cad5bae935fe4eb22e6f75&fullName=src/Microsoft.AspNet.SignalR.Hosting.AspNet45/WebSocketMessageReader.cs&project=TerenceLewis/SignalR
+		public static async Task accept(WebSocket ws)
 		{
-			if (socks.ContainsKey(producer_id) == false)
-			{
-				socks[producer_id] = new List<WebSocket>{};
-			}
-			socks[producer_id].Add(ws);
-			log.Information("Adding new websocket {ws} to list {producer_id}. Websockets count {count}", ws.GetHashCode(), producer_id, socks[producer_id].Count);
+			subscriptions.Add(ws, new HashSet<int>());
+			log.Information("Adding new websocket {ws} to Dictionary. Websockets count {count}", ws.GetHashCode(), subscriptions.Count);
 			var buffer = new byte[1024 * 4];
 			WebSocketReceiveResult result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 			while (!result.CloseStatus.HasValue)
 			{
-				log.Information("WebSocket {ws} loop. WebSocket count {count}", ws.GetHashCode(), socks[producer_id].Count);
+				log.Information("WebSocket {ws} loop. WebSocket count {count}", ws.GetHashCode(), subscriptions.Count);
 				//Echo websocket message:
 				await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
 				result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 			}
 			await ws.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-			socks[producer_id].Remove(ws);
-			log.Information("WebSocket {ws} closed. WebSocket count {count}", ws.GetHashCode(), socks[producer_id].Count);
+			subscriptions.Remove(ws);
+			log.Information("WebSocket {ws} closed. WebSocket count {count}", ws.GetHashCode(), subscriptions.Count);
 		}
 
 
