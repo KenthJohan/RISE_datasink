@@ -32,13 +32,33 @@
 function rand() {
 return Math.random();
 }
-
-Plotly.newPlot('plot', [{
-	x: [1,2,3].map(rand),
-	y: [1,2,3].map(rand),
+//var t = new Date();
+Plotly.newPlot('plot', [
+{
+	x: [],
+	y: [],
 	mode: 'lines',
 	line: {color: '#80CAF6'}
-}]);
+},
+{
+	x: [],
+	y: [],
+	mode: 'lines',
+	line: {color: '#00CAF6'}
+},
+{
+	x: [],
+	y: [],
+	mode: 'lines',
+	line: {color: '#800AF6'}
+},
+{
+	x: [],
+	y: [],
+	mode: 'lines',
+	line: {color: '#80CA06'}
+},
+]);
 
 /*
 var cnt = 0;
@@ -59,16 +79,30 @@ var interval = setInterval(function()
 var element_output = document.getElementById("out");
 var element_form = document.getElementById("form");
 
-
-function ws_connect(producer_id)
+function ws_subscribe(socket, producer_id)
 {
-	var url = ws_url("/subscribe_ws");
-	console.log("WebSocket: ", url);
-	socket = new WebSocket(url);
+	var buffer = new ArrayBuffer(4);
+	var dv = new DataView(buffer);
+	dv.setInt16(0, producer_id, true);
+	console.log("Sending:", buf2hex(buffer));
+	socket.send(buffer);
+}
+
+function ws_connect(url)
+{
+	console.log("WebSocket opening:", url);
+	var socket = new WebSocket(url);
 	socket.binaryType = "arraybuffer";
 	socket.onopen = function (event)
 	{
-		console.log(event);
+		console.log("WebSocket onopen: ", url, event);
+		/*
+		var buffer = new ArrayBuffer(4);
+		var dv = new DataView(buffer);
+		dv.setInt16(0, producer_id, true);
+		console.log("Sending:", buf2hex(buffer));
+		socket.send(buffer);
+		*/
 	};
 	socket.onclose = function (event)
 	{
@@ -76,14 +110,22 @@ function ws_connect(producer_id)
 	};
 	socket.onerror = function (event)
 	{
-		console.log(event);
-		element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
+		console.warn(event);
+		//element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
 	};
 	socket.onmessage = function (event)
 	{
 		const view = new DataView(event.data);
-		console.log(buf2hex(event.data), view.getUint32(0, true), view.getBigInt64(4, true), view.getFloat32(12, true));
-		console.log(new Date(Number(view.getBigInt64(4, true))));
+		//console.log(view);
+		console.log(buf2hex(event.data), view.getInt32(0, true), new Date(Number(view.getBigInt64(4, true))), view.getFloat32(12, true));
+		//console.log(new Date(Number(view.getBigInt64(4, true))));
+		var producer_id = view.getInt32(0, true);
+		var time = new Date(Number(view.getBigInt64(4, true)));
+		var value = view.getFloat32(12, true);
+		Plotly.extendTraces('plot', {
+			x: [[time.toISOString()]],
+			y: [[value]]
+		}, [producer_id]);
 		/*
 		Plotly.extendTraces('plot', {
 			x: [[rand()]],
@@ -91,16 +133,32 @@ function ws_connect(producer_id)
 		}, [0]);
 		*/
 	};
+	return socket;
 };
 
 
 
+var url = ws_url("/subscribe_ws");
+var socket = ws_connect(url);
 
 element_form.onsubmit = (event) =>
 {
-	ws_connect(event.target.producer_id.value);
 	event.preventDefault();
+	ws_subscribe(socket, event.target.producer_id.value);
+	//ws_connect(event.target.producer_id.value);
+	/*
+	Plotly.addTraces('plot', 
+	{
+		x: [],
+		y: [],
+		mode: 'lines',
+		line: {color: '#80CA06'}
+	});
+	*/
 }
+
+
+
 
 </script>
 </body>

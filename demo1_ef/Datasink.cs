@@ -43,6 +43,30 @@ namespace Demo
 		}
 	}
 
+	[StructLayout(LayoutKind.Explicit, Pack = 1)]
+	public unsafe struct Subscription_Message
+	{
+		[FieldOffset(0)]
+		public fixed byte data[4];
+
+		[FieldOffset(0)]
+		public Int32 producer_id;
+
+		public unsafe static Subscription_Message FromBytes(byte[] data)
+		{
+			Subscription_Message msg = new Subscription_Message{};
+			Marshal.Copy(data, 0, (IntPtr)msg.data, Marshal.SizeOf(typeof(Subscription_Message)));
+			return msg;
+		}
+
+		public Subscription_Message FromArraySegment(ArraySegment<byte> data)
+		{
+			return FromBytes(data.Array);
+		}
+
+	}
+
+
 	//https://stackoverflow.com/questions/2404247/datetime-to-javascript-date
 	public static class DateTimeJavaScript
 	{
@@ -94,11 +118,11 @@ namespace Demo
 							sock.SendAsync(message.GetArraySegment(), WebSocketMessageType.Binary, true, CancellationToken.None);
 							//string json = JsonSerializer.Serialize(state);
 							//send(sock, json, WebSocketMessageType.Text, true, CancellationToken.None);
-							subscriptions[sock].Remove(state.producer_id);
+							//subscriptions[sock].Remove(state.producer_id);
 						}
 						else
 						{
-							subscriptions[sock].Add(state.producer_id);
+							//subscriptions[sock].Add(state.producer_id);
 						}
 						break;
 					case WebSocketState.Closed:
@@ -122,9 +146,12 @@ namespace Demo
 			WebSocketReceiveResult result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 			while (!result.CloseStatus.HasValue)
 			{
-				log.Information("WebSocket {ws} loop. WebSocket count {count}", ws.GetHashCode(), subscriptions.Count);
+				Subscription_Message message = Subscription_Message.FromBytes(buffer);
+				log.Information("WebSocket {ws} subscribes {producer_id}", ws.GetHashCode(), message.producer_id);
+				subscriptions[ws].Add(message.producer_id);
+				//log.Information("WebSocket {ws} loop. WebSocket count {count}. {@Subscription_Message}", ws.GetHashCode(), subscriptions.Count, message);
 				//Echo websocket message:
-				await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
+				//await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
 				result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 			}
 			await ws.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
