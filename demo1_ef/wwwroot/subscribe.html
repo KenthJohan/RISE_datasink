@@ -76,7 +76,7 @@ function ws_togglesub(socket, producer_id)
 	var buffer = new ArrayBuffer(4);
 	var dv = new DataView(buffer);
 	dv.setInt16(0, producer_id, true);
-	console.log("Sending:", buf2hex(buffer));
+	console.log("Websocket send: ", buf2hex(buffer), " to ", socket.url);
 	socket.send(buffer);
 }
 
@@ -88,7 +88,6 @@ function subscribe(socket, producer_id, longname, method)
 {
 	//Check if this is already subscribed:
 	var trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
-	console.log(element_plot.data, trace_index);
 	if (trace_index >= 0)
 	{
 		if ((method == 2) || (method == 0))
@@ -117,7 +116,6 @@ function subscribe(socket, producer_id, longname, method)
 		console.log("Subscribe", producer_id, trace_index);
 		Plotly.addTraces(element_plot, trace);
 	}
-	console.log(element_plot.data, trace_index);
 }
 
 
@@ -128,7 +126,7 @@ function subscribe(socket, producer_id, longname, method)
 
 function ws_connect(url)
 {
-	console.log("WebSocket opening:", url);
+	console.log("WebSocket open:", url);
 	var socket = new WebSocket(url);
 	socket.binaryType = "arraybuffer";
 	socket.onopen = function (event)
@@ -144,11 +142,11 @@ function ws_connect(url)
 	};
 	socket.onclose = function (event)
 	{
-		console.log(event);
+		console.log("WebSocket onclose: ", event);
 	};
 	socket.onerror = function (event)
 	{
-		console.warn(event);
+		console.warn("WebSocket onerror: ", event);
 		//element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
 	};
 	socket.onmessage = function (event)
@@ -160,7 +158,7 @@ function ws_connect(url)
 		var producer_id = view.getInt32(0, true);
 		var time = new Date(Number(view.getBigInt64(4, true)));
 		var value = view.getFloat32(12, true);
-		var trace_index = traces[producer_id];
+		var trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
 		Plotly.extendTraces('plot', {
 			x: [[time.toISOString()]],
 			y: [[value]]
@@ -185,7 +183,6 @@ element_form.onsubmit = (event) =>
 	var producer_id = Number(event.target.producer_id.value);
 	var producer_longname = event.target.producer_id.querySelector('option[value="'+producer_id+'"]').innerText;
 	event.preventDefault();
-	console.log();
 	subscribe(socket, producer_id, producer_longname, 2);
 	//ws_connect(event.target.producer_id.value);
 	/*

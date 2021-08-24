@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 using Npgsql;
+using NpgsqlTypes;
 
 
 //https://www.codeproject.com/Articles/5263745/Return-DataTable-Using-Entity-Framework
@@ -20,6 +21,8 @@ namespace Demo
 
 		public static string npgsql_connection = "Server=localhost; Port=5432; UserId=datasink; Password=datasink; Database=datasink";
 		//public static string npgsql_connection = "Host=localhost:5432;Database=datasink;Username=postgres;Password=secret";
+		public static NpgsqlConnection connection;
+		public static NpgsqlCommand command_insert_floatval;
 
 		private static readonly ILogger log = Log.ForContext(typeof(DB));
 
@@ -90,6 +93,12 @@ namespace Demo
 			context.config_hypertables();
 			context.add_test_data();
 
+			connection = new NpgsqlConnection(DB.npgsql_connection);
+			connection.Open();
+			command_insert_floatval = new NpgsqlCommand("INSERT INTO floatvals (producer_id,value) VALUES (@producer_id, @value)", connection);
+			command_insert_floatval.Parameters.Add("producer_id", NpgsqlDbType.Integer);
+			command_insert_floatval.Parameters.Add("value", NpgsqlDbType.Real);
+			command_insert_floatval.Prepare();
 			//Testing.db_add_example(context);
 		}
 

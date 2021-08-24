@@ -10,6 +10,7 @@ This project is under http://datasink.testbed.se
 * C# dotnet aspnetcore
 * Javascript for sensor GUI
 * Openstreemap for geo tagged sensor data
+* plotly for plotting timeseries in realtime
 
 
 ## Installing dotnet
