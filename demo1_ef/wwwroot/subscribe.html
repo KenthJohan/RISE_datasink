@@ -19,7 +19,7 @@
 		<label for="producer_id">Producer</label><br>
 		<select name="producer_id" graphql_option="producers{value:id name:name name1:quantity_name quantity_id}"></select>
 	</p>
-	<p><input type="submit"></p>
+	<p><input type="submit" value="Toggle subscription"></p>
 </form>
 
 <div id="plot"></div>
@@ -29,36 +29,9 @@
 <script src='add.js'></script>
 <script>
 	//https://plotly.com/javascript/streaming/
-function rand() {
-return Math.random();
-}
+
 //var t = new Date();
-Plotly.newPlot('plot', [
-{
-	x: [],
-	y: [],
-	mode: 'lines',
-	line: {color: '#80CAF6'}
-},
-{
-	x: [],
-	y: [],
-	mode: 'lines',
-	line: {color: '#00CAF6'}
-},
-{
-	x: [],
-	y: [],
-	mode: 'lines',
-	line: {color: '#800AF6'}
-},
-{
-	x: [],
-	y: [],
-	mode: 'lines',
-	line: {color: '#80CA06'}
-},
-]);
+
 
 /*
 var cnt = 0;
@@ -78,8 +51,19 @@ var interval = setInterval(function()
 
 var element_output = document.getElementById("out");
 var element_form = document.getElementById("form");
+var element_plot = document.getElementById("plot");
+var traces = {};
 
-function ws_subscribe(socket, producer_id)
+
+
+
+
+Plotly.newPlot(element_plot, []);
+
+//console.log(element_plot);
+
+
+function ws_togglesub(socket, producer_id)
 {
 	var buffer = new ArrayBuffer(4);
 	var dv = new DataView(buffer);
@@ -87,6 +71,51 @@ function ws_subscribe(socket, producer_id)
 	console.log("Sending:", buf2hex(buffer));
 	socket.send(buffer);
 }
+
+
+//When method = 0: Unsubscribe
+//When method = 1: Subscribe
+//When method = 2: Toggle subscription
+function subscribe(socket, producer_id, method)
+{
+	//Check if this is already subscribed:
+	if (producer_id in traces)
+	{
+		if ((method == 2) || (method == 0))
+		{
+			var trace_index = traces[producer_id];
+			Plotly.deleteTraces(element_plot, trace_index);
+			ws_togglesub(socket, producer_id);
+			console.log("Unsubscribe", producer_id, trace_index);
+			delete traces[producer_id];
+		}
+		else
+		{
+			console.log("The producer " + producer_id + " is already subscribed");
+		}
+	}
+	else if ((method == 2) || (method == 1))
+	{
+		ws_togglesub(socket, producer_id);
+		var trace =
+		{
+			x: [],
+			y: [],
+			name: "Producer " + producer_id,
+			type: 'scatter'
+		};
+		traces[producer_id] = element_plot.data.length;
+		console.log("Subscribe", producer_id, traces[producer_id]);
+		Plotly.addTraces(element_plot, trace);
+	}
+	console.log(element_plot.data);
+}
+
+
+
+
+
+
 
 function ws_connect(url)
 {
@@ -122,10 +151,11 @@ function ws_connect(url)
 		var producer_id = view.getInt32(0, true);
 		var time = new Date(Number(view.getBigInt64(4, true)));
 		var value = view.getFloat32(12, true);
+		var trace_index = traces[producer_id];
 		Plotly.extendTraces('plot', {
 			x: [[time.toISOString()]],
 			y: [[value]]
-		}, [producer_id]);
+		}, [trace_index]);
 		/*
 		Plotly.extendTraces('plot', {
 			x: [[rand()]],
@@ -144,7 +174,7 @@ var socket = ws_connect(url);
 element_form.onsubmit = (event) =>
 {
 	event.preventDefault();
-	ws_subscribe(socket, event.target.producer_id.value);
+	subscribe(socket, event.target.producer_id.value, 2);
 	//ws_connect(event.target.producer_id.value);
 	/*
 	Plotly.addTraces('plot', 

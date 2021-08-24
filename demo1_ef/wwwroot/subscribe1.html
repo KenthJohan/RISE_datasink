@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Subscribe</title>
+	<link rel="stylesheet" type="text/css" href="arena.css" />
+
+
+	<style>
+
+	</style>
+</head>
+
+<body>
+
+
+	<h1>Subscribe</h1>
+
+	<form id="form">
+		<p>
+			<label for="producer_id">Producer</label><br>
+			<select name="producer_id"
+				graphql_option="producers{value:id name:name name1:quantity_name quantity_id}"></select>
+		</p>
+		<p><input type="submit"></p>
+	</form>
+
+	<div id="plot"></div>
+
+
+	<script src='basic.js'></script>
+	<script src='add.js'></script>
+	<script src='https://cdn.jsdelivr.net/npm/apexcharts'></script>
+	<script>
+
+		var element_output = document.getElementById("out");
+		var element_form = document.getElementById("form");
+		var element_plot = document.getElementById("plot");
+		var alldata = [];
+		alldata[0] = [];
+		alldata[1] = [];
+		alldata[2] = [];
+		alldata[3] = [];
+
+		alldata[0].push({x:2,y:5},{x:3,y:7},{x:4,y:2});
+		alldata[1].push({x:5,y:6},{x:6,y:14},{x:7,y:22});
+
+		function ws_subscribe(socket, producer_id)
+		{
+			//Idempotent
+			if (Array.isArray(alldata[producer_id]) == false)
+			{
+				alldata[producer_id] = [];
+			}
+			var buffer = new ArrayBuffer(4);
+			var dv = new DataView(buffer);
+			dv.setInt16(0, producer_id, true);
+			console.log("Subscribe:", buf2hex(buffer));
+			socket.send(buffer);
+		}
+
+		function ws_connect(url) {
+			console.log("WebSocket opening:", url);
+			var socket = new WebSocket(url);
+			socket.binaryType = "arraybuffer";
+			socket.onopen = function (event) {
+				console.log("WebSocket onopen: ", url, event);
+			};
+			socket.onclose = function (event) {
+				console.log(event);
+			};
+			socket.onerror = function (event) {
+				console.warn(event);
+				//element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
+			};
+			socket.onmessage = function (event) {
+				const view = new DataView(event.data);
+				//console.log(view);
+				console.log(buf2hex(event.data), view.getInt32(0, true), new Date(Number(view.getBigInt64(4, true))), view.getFloat32(12, true));
+				//console.log(new Date(Number(view.getBigInt64(4, true))));
+				var producer_id = view.getInt32(0, true);
+				var time = new Date(Number(view.getBigInt64(4, true)));
+				var value = view.getFloat32(12, true);
+
+				alldata[producer_id].push({x:time,y:value});
+
+				chart.updateSeries([{
+					name:producer_id,
+					data: alldata[producer_id]
+				}]);
+			};
+			return socket;
+		};
+
+
+
+		var url = ws_url("/subscribe_ws");
+		var socket = ws_connect(url);
+
+		element_form.onsubmit = (event) => {
+			event.preventDefault();
+			ws_subscribe(socket, event.target.producer_id.value);
+		}
+
+
+		var options = {
+			series: [],
+			chart: {
+				id: 'realtime',
+				height: 350,
+				type: 'line',
+				animations: {
+					enabled: true,
+					easing: 'linear',
+					dynamicAnimation: {
+						speed: 1000
+					}
+				},
+				toolbar: {
+					show: false
+				},
+				zoom: {
+					enabled: false
+				}
+			},
+			colors: ['#77B6EA', '#545454'],
+			dataLabels: {
+				enabled: true
+			},
+			stroke: {
+				curve: 'smooth'
+			},
+			title: {
+				text: 'Dynamic Updating Chart',
+				align: 'left'
+			},
+			markers: {
+				size: 0
+			},
+			xaxis: {
+				type: 'datetime',
+				//range: XAXISRANGE,
+			},
+			yaxis: {
+				max: 100
+			},
+			legend: {
+				position: 'top',
+				horizontalAlign: 'right',
+				floating: true,
+				offsetY: -25,
+				offsetX: -5
+			},
+		};
+
+		var chart = new ApexCharts(document.querySelector("#plot"), options);
+		chart.render();
+
+
+
+		function rand(min, max)
+		{
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		
+
+		window.setInterval(function () {
+			chart.updateSeries([
+				{
+					name: "s"+0,
+					data: alldata[0]
+				},
+				{
+					name: "s"+1,
+					data: alldata[1]
+				},
+				{
+					name: "s"+2,
+					data: alldata[2]
+				}
+			]);
+		}, 4000);
+
+
+		/*
+		var time = 0;
+		window.setInterval(function () {
+			time++;
+			var x = time;
+			var y = rand(-10,10);
+			alldata[0].push({x:x, y:y});
+			chart.updateSeries([
+				{
+					name: "s"+0,
+					data: alldata[0]
+				},
+				{
+					name: "s"+1,
+					data: alldata[1]
+				},
+				{
+					name: "s"+2,
+					data: alldata[2]
+				}
+			]);
+		}, 4000);
+		window.setInterval(function () {
+			var x = time;
+			var y = rand(-10,10);
+			alldata[1].push({x:x, y:y});
+		}, 2000);
+		window.setInterval(function () {
+			var x = time;
+			var y = rand(-10,10);
+			alldata[2].push({x:x, y:y});
+		}, 3000);	
+		*/
+
+	</script>
+</body>
+
+</html>
