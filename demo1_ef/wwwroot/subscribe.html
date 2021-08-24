@@ -6,13 +6,19 @@
 <link rel="stylesheet" type="text/css" href="arena.css"/>
 <script src="https://cdn.plot.ly/plotly-2.3.1.min.js"></script>
 <style>
-
+body
+{
+	display: flex;
+	background-color: whitesmoke;
+	gap: 12px;
+}
+#plot
+{
+	height: 100%;
+}
 </style>
 </head>
 <body>
-
-
-<h1>Subscribe</h1>
 
 <form id="form">
 	<p>
@@ -52,13 +58,15 @@ var interval = setInterval(function()
 var element_output = document.getElementById("out");
 var element_form = document.getElementById("form");
 var element_plot = document.getElementById("plot");
-var traces = {};
 
 
 
 
-
-Plotly.newPlot(element_plot, []);
+var layout = 
+{
+	showlegend: true,
+};
+Plotly.newPlot(element_plot, [], layout);
 
 //console.log(element_plot);
 
@@ -76,18 +84,18 @@ function ws_togglesub(socket, producer_id)
 //When method = 0: Unsubscribe
 //When method = 1: Subscribe
 //When method = 2: Toggle subscription
-function subscribe(socket, producer_id, method)
+function subscribe(socket, producer_id, longname, method)
 {
 	//Check if this is already subscribed:
-	if (producer_id in traces)
+	var trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
+	console.log(element_plot.data, trace_index);
+	if (trace_index >= 0)
 	{
 		if ((method == 2) || (method == 0))
 		{
-			var trace_index = traces[producer_id];
 			Plotly.deleteTraces(element_plot, trace_index);
 			ws_togglesub(socket, producer_id);
 			console.log("Unsubscribe", producer_id, trace_index);
-			delete traces[producer_id];
 		}
 		else
 		{
@@ -99,16 +107,17 @@ function subscribe(socket, producer_id, method)
 		ws_togglesub(socket, producer_id);
 		var trace =
 		{
-			x: [],
-			y: [],
-			name: "Producer " + producer_id,
-			type: 'scatter'
+			visible: true,
+			x: [null],
+			y: [null],
+			name: longname ? longname : ("Producer " + producer_id),
+			type: 'scatter',
+			producer_id: producer_id
 		};
-		traces[producer_id] = element_plot.data.length;
-		console.log("Subscribe", producer_id, traces[producer_id]);
+		console.log("Subscribe", producer_id, trace_index);
 		Plotly.addTraces(element_plot, trace);
 	}
-	console.log(element_plot.data);
+	console.log(element_plot.data, trace_index);
 }
 
 
@@ -173,8 +182,11 @@ var socket = ws_connect(url);
 
 element_form.onsubmit = (event) =>
 {
+	var producer_id = Number(event.target.producer_id.value);
+	var producer_longname = event.target.producer_id.querySelector('option[value="'+producer_id+'"]').innerText;
 	event.preventDefault();
-	subscribe(socket, event.target.producer_id.value, 2);
+	console.log();
+	subscribe(socket, producer_id, producer_longname, 2);
 	//ws_connect(event.target.producer_id.value);
 	/*
 	Plotly.addTraces('plot', 
