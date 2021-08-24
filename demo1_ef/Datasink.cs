@@ -147,8 +147,16 @@ namespace Demo
 			while (!result.CloseStatus.HasValue)
 			{
 				Subscription_Message message = Subscription_Message.FromBytes(buffer);
-				log.Information("WebSocket {ws} subscribes {producer_id}", ws.GetHashCode(), message.producer_id);
-				subscriptions[ws].Add(message.producer_id);
+				if (subscriptions[ws].Contains(message.producer_id))
+				{
+					log.Information("WebSocket {ws} unsubscribes {producer_id}", ws.GetHashCode(), message.producer_id);
+					subscriptions[ws].Remove(message.producer_id);
+				}
+				else
+				{
+					log.Information("WebSocket {ws} subscribes {producer_id}", ws.GetHashCode(), message.producer_id);
+					subscriptions[ws].Add(message.producer_id);
+				}
 				//log.Information("WebSocket {ws} loop. WebSocket count {count}. {@Subscription_Message}", ws.GetHashCode(), subscriptions.Count, message);
 				//Echo websocket message:
 				//await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
