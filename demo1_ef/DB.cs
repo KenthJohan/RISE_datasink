@@ -90,8 +90,9 @@ namespace Demo
 			if (created){Log.Information("Database created");}
 			else{Log.Information("Database not created, already exist");}
 
-			context.config_hypertables();
-			context.add_test_data();
+			config_hypertables(context);
+			Testdata.add(context);
+			Pubs.load(context);
 
 			connection = new NpgsqlConnection(DB.npgsql_connection);
 			connection.Open();
@@ -121,7 +122,16 @@ namespace Demo
 			conn.Close(); 
 		}
 
-
+		public static void config_hypertables(this Demo_Context context)
+		{
+			int r;
+			r = context.Database.ExecuteSqlRaw($"CREATE EXTENSION IF NOT EXISTS timescaledb;");
+			Log.Information("CREATE timescaledb {r}", r);
+			r = context.Database.ExecuteSqlRaw($"SELECT create_hypertable('floatvals', 'time');");
+			Log.Information("create_hypertable {r}", r);
+			r = context.Database.ExecuteSqlRaw($"SELECT add_dimension('floatvals', 'producer_id', number_partitions => 4);");
+			Log.Information("add_dimension {r}", r);
+		}
 
 	}
 }

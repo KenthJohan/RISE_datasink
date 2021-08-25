@@ -105,13 +105,13 @@ namespace Demo
 
 
 
-		[HttpGet("/subscribe_ws")]
-		public async Task subscribe_ws(int producer_id)
+		[HttpGet("/ws/sub")]
+		public async Task ws_sub()
 		{
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Websock_Subs.accept(await c.WebSockets.AcceptWebSocketAsync());
+				await Subs.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{
@@ -121,7 +121,20 @@ namespace Demo
 		}
 
 
-
+		[HttpGet("/ws/pub")]
+		public async Task ws_pub()
+		{
+			var c = ControllerContext.HttpContext;
+			if (c.WebSockets.IsWebSocketRequest)
+			{
+				await Pubs.accept(await c.WebSockets.AcceptWebSocketAsync());
+			}
+			else
+			{
+				c.Response.StatusCode = 400;
+				await c.Response.WriteAsync("WebSocket does not work :(");
+			}
+		}
 
 
 

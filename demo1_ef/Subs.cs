@@ -22,10 +22,16 @@ using System.Diagnostics;
 namespace Demo
 {
 
-	public static class Websock_Subs
+	public static class Subs
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(Websock_Subs));
+		private static readonly ILogger log = Log.ForContext(typeof(Subs));
+
+		// Used for O(1) complexity
+		// [websocket][producer_id]
 		private static Dictionary<WebSocket, HashSet<int>> subs0 = new Dictionary<WebSocket, HashSet<int>>();
+
+		// Used for O(1) complexity
+		// [producer_id][websocket]
 		private static Dictionary<int, HashSet<WebSocket>> subs1 = new Dictionary<int, HashSet<WebSocket>>();
 
 
@@ -38,28 +44,28 @@ namespace Demo
 		}
 
 
-		private static void send(WebSocket sock, Floatval state)
+		private static void send(WebSocket sock, int producer_id, DateTime time, float value)
 		{
 			Msg_Float message = new Msg_Float { };
-			message.producer_id = state.producer_id;
-			message.time = DateTimeJavaScript.ToJavaScriptMilliseconds(state.time);
-			message.value = state.value;
+			message.producer_id = producer_id;
+			message.time = DateTimeJavaScript.ToJavaScriptMilliseconds(time);
+			message.value = value;
 			sock.SendAsync(message.GetArraySegment(), WebSocketMessageType.Binary, true, CancellationToken.None);
 		}
 
 		//High frequency function.
 		//This must be perfomant.
-		public static void publish(Floatval state)
+		public static void publish(int producer_id, DateTime time, float value)
 		{
-			log.Information("Producer {producer_id} adds value {@Floatval}", state.producer_id, state);
-			if (subs1.ContainsKey(state.producer_id))
+			log.Information("Publish {producer_id} {time} {value}", producer_id, time, value);
+			if (subs1.ContainsKey(producer_id))
 			{
-				foreach (WebSocket ws in subs1[state.producer_id])
+				foreach (WebSocket ws in subs1[producer_id])
 				{
 					switch (ws.State)
 					{
 						case WebSocketState.Open:
-							send(ws, state);
+							send(ws, producer_id, time, value);
 							break;
 						case WebSocketState.Closed:
 							log.Information("ws Closed");

@@ -28,6 +28,8 @@ namespace Demo
 					.AddTypeExtension<Project_Query>()
 					.AddTypeExtension<Quantity_Query>()
 					.AddTypeExtension<Producer_Query>()
+					.AddTypeExtension<Memloc_Query>()
+					.AddTypeExtension<Layout_Query>()
 				.AddMutationType(d => d.Name("Mutation"))
 					.AddTypeExtension<User_Mutation>()
 					.AddTypeExtension<Floatval_Mutation>()

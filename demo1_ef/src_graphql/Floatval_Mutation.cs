@@ -24,7 +24,7 @@ namespace Demo
 			state.producer_id = producer_id;
 			context.floatvals.Add(state);
 			context.SaveChanges();
-			Websock_Subs.publish(state);
+			Subs.publish(state.producer_id, state.time, state.value);
 			return 0;
 		}
 
