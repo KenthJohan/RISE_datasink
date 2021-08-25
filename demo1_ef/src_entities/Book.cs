@@ -18,6 +18,6 @@ namespace Demo
 
         [ForeignKey("author")]
 		public int? author_id { get; set; }
-		public User author { get; set; }
+		public virtual User author { get; set; }
 	}
 }

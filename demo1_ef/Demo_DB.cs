@@ -95,8 +95,9 @@ namespace Demo
 
 			connection = new NpgsqlConnection(DB.npgsql_connection);
 			connection.Open();
-			command_insert_floatval = new NpgsqlCommand("INSERT INTO floatvals (producer_id,value) VALUES (@producer_id, @value)", connection);
+			command_insert_floatval = new NpgsqlCommand("INSERT INTO floatvals (producer_id,time,value) VALUES (@producer_id, @time, @value)", connection);
 			command_insert_floatval.Parameters.Add("producer_id", NpgsqlDbType.Integer);
+			command_insert_floatval.Parameters.Add("time", NpgsqlDbType.Timestamp);//Is this this timestamp without timezone?
 			command_insert_floatval.Parameters.Add("value", NpgsqlDbType.Real);
 			command_insert_floatval.Prepare();
 			//Testing.db_add_example(context);

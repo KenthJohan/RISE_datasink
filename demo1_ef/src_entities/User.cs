@@ -25,6 +25,6 @@ namespace Demo
 		public byte[] pwhash { get; set; }
 
 
-		public ICollection<Book> books { get; set; }
+		public virtual ICollection<Book> books { get; set; }
 	}
 }

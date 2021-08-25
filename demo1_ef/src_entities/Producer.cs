@@ -10,7 +10,7 @@ namespace Demo
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int id { get; set; }
 		public string name { get; set; }
-		public ICollection<Floatval> floatvals { get; set; }
+		public virtual ICollection<Floatval> floatvals { get; set; }
 
 
 		public int device_id { get; set; } = 1;

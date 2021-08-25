@@ -44,39 +44,38 @@ using System.Diagnostics;
 
 namespace Demo
 {
-	public class Layout
-	{
-		public int id;
-	}
 
-	public class Memloc
-	{
-		public int layout_id;
-		public int producer_id;
-		public int byteoffset;
-	};
+
+
 
 	class Door
 	{
 
-		private static void insert(NpgsqlCommand cmd, List<Memloc> memlocs, ReadOnlySpan<byte> buffer)
+		private static void msg_receive(NpgsqlCommand cmd, List<Memloc> memlocs, ReadOnlySpan<byte> buffer)
 		{
 			foreach(var memloc in memlocs)
 			{
-				float value = BinaryPrimitives.ReadSingleBigEndian(buffer.Slice(memloc.byteoffset));
-				cmd.Parameters.AddWithValue("producer_id", memloc.producer_id);
-				cmd.Parameters.AddWithValue("value", value);
+				//Debug.Assert(memloc.byteoffset > 3);
+				Floatval v = new Floatval{};
+				v.value = BinaryPrimitives.ReadSingleBigEndian(buffer.Slice(memloc.byteoffset));
+				v.producer_id = memloc.producer_id;
+				v.time = DateTime.Now;
+				cmd.Parameters.AddWithValue("producer_id", v.producer_id);
+				cmd.Parameters.AddWithValue("time", v.time);
+				cmd.Parameters.AddWithValue("value", v.value);
+				Websock_Subs.publish(v);
 			}
 			int r = cmd.ExecuteNonQuery();
 			Debug.Assert(r == memlocs.Count);
 		}
 
 
-
-		private static void insert(NpgsqlCommand cmd, Dictionary<int, List<Memloc>> layouts, ReadOnlySpan<byte> buffer)
+		// |byte0|byte1|byte2|byte3|byte4|byte5|byte6|byte7|byte8|
+		// |        layout_id      |                             |
+		private static void msg_receive(NpgsqlCommand cmd, Dictionary<int, List<Memloc>> layouts, ReadOnlySpan<byte> buffer)
 		{
 			int layout_id = BinaryPrimitives.ReadInt32BigEndian(buffer.Slice(0));
-			insert(cmd, layouts[layout_id], buffer);
+			msg_receive(cmd, layouts[layout_id], buffer);
 		}
 
 

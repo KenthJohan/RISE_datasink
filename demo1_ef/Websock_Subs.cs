@@ -25,12 +25,12 @@ namespace Demo
 	public static class Websock_Subs
 	{
 		private static readonly ILogger log = Log.ForContext(typeof(Websock_Subs));
-		public static Dictionary<WebSocket, HashSet<int>> subs0 = new Dictionary<WebSocket, HashSet<int>>();
-		public static Dictionary<int, HashSet<WebSocket>> subs1 = new Dictionary<int, HashSet<WebSocket>>();
+		private static Dictionary<WebSocket, HashSet<int>> subs0 = new Dictionary<WebSocket, HashSet<int>>();
+		private static Dictionary<int, HashSet<WebSocket>> subs1 = new Dictionary<int, HashSet<WebSocket>>();
 
 
 
-		public static void send(WebSocket sock, string buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationTokene)
+		private static void send(WebSocket sock, string buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationTokene)
 		{
 			var bytes = Encoding.ASCII.GetBytes(buffer);
 			var arraySegment = new ArraySegment<byte>(bytes);
@@ -38,7 +38,7 @@ namespace Demo
 		}
 
 
-		public static void send(WebSocket sock, Floatval state)
+		private static void send(WebSocket sock, Floatval state)
 		{
 			Msg_Float message = new Msg_Float { };
 			message.producer_id = state.producer_id;
@@ -49,10 +49,8 @@ namespace Demo
 
 		//High frequency function.
 		//This must be perfomant.
-		public static void add(Demo_Context context, Floatval state)
+		public static void publish(Floatval state)
 		{
-			context.floatvals.Add(state);
-			context.SaveChanges();
 			log.Information("Producer {producer_id} adds value {@Floatval}", state.producer_id, state);
 			if (subs1.ContainsKey(state.producer_id))
 			{

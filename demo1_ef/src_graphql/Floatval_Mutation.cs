@@ -22,7 +22,9 @@ namespace Demo
 			state.value = value;
 			state.time = DateTime.Now;
 			state.producer_id = producer_id;
-			Websock_Subs.add(context, state);
+			context.floatvals.Add(state);
+			context.SaveChanges();
+			Websock_Subs.publish(state);
 			return 0;
 		}
 
