@@ -118,10 +118,15 @@ namespace Demo
 			{
 				List<Memloc> records = new List<Memloc>
 				{
-					new Memloc { id = 1, layout_id = 4, producer_id = 1, byteoffset = 8 },
-					new Memloc { id = 2, layout_id = 4, producer_id = 2, byteoffset = 8 },
-					new Memloc { id = 3, layout_id = 4, producer_id = 3, byteoffset = 8 },
-					new Memloc { id = 4, layout_id = 4, producer_id = 4, byteoffset = 8 },
+					new Memloc { id = 1, layout_id = 1, producer_id = 5, byteoffset = 8 },
+					new Memloc { id = 2, layout_id = 1, producer_id = 6, byteoffset = 12 },
+					new Memloc { id = 3, layout_id = 1, producer_id = 7, byteoffset = 16 },
+					new Memloc { id = 4, layout_id = 1, producer_id = 8, byteoffset = 20 },
+
+					new Memloc { id = 5, layout_id = 4, producer_id = 1, byteoffset = 8 },
+					new Memloc { id = 6, layout_id = 4, producer_id = 2, byteoffset = 12 },
+					new Memloc { id = 7, layout_id = 4, producer_id = 3, byteoffset = 16 },
+					new Memloc { id = 8, layout_id = 4, producer_id = 4, byteoffset = 20 },
 				};
 				context.memlocs.AddRange(records);
 			}

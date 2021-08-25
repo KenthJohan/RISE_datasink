@@ -20,10 +20,17 @@ namespace Demo
 
 
 		[UseProjection]
-		public IQueryable<Memloc> memlocs([Service] Demo_Context context)
+		public IQueryable<Memloc> memlocs([Service] Demo_Context context, int? layout_id)
 		{
 			log.Information("Fetching memlocs");
-			return context.memlocs;
+			if (layout_id == null)
+			{
+				return context.memlocs;
+			}
+			else
+			{
+				return context.memlocs.Where(x => x.layout_id == layout_id);
+			}
 		}
 
 	}

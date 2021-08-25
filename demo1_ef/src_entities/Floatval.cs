@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace Demo
 		public float value { get; set; }
 
 		//Medium frequency
+
 		public float longitude { get; set; } = 0.0f;
 		public float latitude { get; set; } = 0.0f;
 

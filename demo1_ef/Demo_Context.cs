@@ -68,6 +68,8 @@ namespace Demo
 			builder.Entity<Producer>().HasMany(t => t.floatvals).WithOne(t => t.producer).HasForeignKey(t => t.producer_id);
 			builder.Entity<Layout>().HasMany(t => t.memlocs).WithOne(t => t.layout).HasForeignKey(t => t.layout_id);
 			builder.Entity<Floatval>().HasKey(u => new{u.time,u.producer_id});
+			builder.Entity<Floatval>().Property(b => b.longitude).HasDefaultValueSql("0.0");
+			builder.Entity<Floatval>().Property(b => b.latitude).HasDefaultValueSql("0.0");
 		}
 	}
 

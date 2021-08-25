@@ -86,6 +86,8 @@ namespace Demo
 				importer.Write(producer_id);
 				importer.Write(time);
 				importer.Write(value);
+				//importer.Write(0.0f);
+				//importer.Write(0.0f);
 				Subs.publish(producer_id, time, value);
 			}
 			ulong r = importer.Complete();
