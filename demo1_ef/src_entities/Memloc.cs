@@ -14,5 +14,6 @@ namespace Demo
 		public int producer_id { get; set; }
 		public int byteoffset { get; set; }
 		public virtual Layout layout { get; set; }
+		public virtual Producer producer { get; set; }
 	};
 }

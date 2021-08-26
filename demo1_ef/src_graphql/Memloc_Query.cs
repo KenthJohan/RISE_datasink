@@ -23,13 +23,14 @@ namespace Demo
 		public IQueryable<Memloc> memlocs([Service] Demo_Context context, int? layout_id)
 		{
 			log.Information("Fetching memlocs");
+			IQueryable<Memloc> q = context.memlocs.OrderBy(x => x.byteoffset);
 			if (layout_id == null)
 			{
-				return context.memlocs;
+				return q;
 			}
 			else
 			{
-				return context.memlocs.Where(x => x.layout_id == layout_id);
+				return q.Where(x => x.layout_id == layout_id);
 			}
 		}
 

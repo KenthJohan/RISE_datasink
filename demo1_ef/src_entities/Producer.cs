@@ -11,6 +11,7 @@ namespace Demo
 		public int id { get; set; }
 		public string name { get; set; }
 		public virtual ICollection<Floatval> floatvals { get; set; }
+		public virtual ICollection<Memloc> memlocs { get; set; }
 
 
 		public int device_id { get; set; } = 1;

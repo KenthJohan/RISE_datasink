@@ -157,3 +157,11 @@ function gql_floatval_add(value, onload)
 {
 	gql_request("mutation{floatval_add(value:"+value+")}", onload);
 }
+
+
+
+
+
+
+
+

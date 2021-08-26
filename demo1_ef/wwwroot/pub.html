@@ -7,168 +7,45 @@
 <style>
 body
 {
+}
+
+.test
+{
 	display: flex;
-	background-color: whitesmoke;
 	gap: 12px;
 }
 </style>
 </head>
 <body>
 
-	<table>
-		<thead>
-			<tr>
-				<td>id</td>
-				<td>producer</td>
-				<td>quantity</td>
-				<td>byteoffset</td>
-				<td>value</td>
-				<td>hex</td>
-			</tr>
-		</thead>
-		<tbody id="tbody"></tbody>
+	<div class="test">
+		<table>
+			<thead>
+				<tr>
+					<td>id</td>
+					<td>producer</td>
+					<td>quantity</td>
+					<td>byteoffset</td>
+					<td>value</td>
+					<td>hex</td>
+				</tr>
+			</thead>
+			<tbody id="tbody"></tbody>
+		</table>
+		<button id="pub">Publish</button>
+	</div>
+
+	<hr>
+
+	<table id="bytes">
 	</table>
 
-	<button onclick="pub()">Publish</button>
+
+
 
 <script src='basic.js'></script>
-<script src='add.js'></script>
-<script>
+<script src='pub.js'></script>
 
-	var element_tbody = document.getElementById("tbody");
-	var element_inputs = [];
-	var element_hexs = [];
-	let memlocs;
-	var layout_id = 4;
-	var socket;
-
-/*
-
-		public int id { get; set; }
-		public int layout_id { get; set; }
-		public int producer_id { get; set; }
-		public int byteoffset { get; set; }
-		public virtual Layout layout { get; set; }
-*/
-	{
-		var query = "query{memlocs(layout_id:"+layout_id+"){id layout_id producer_id byteoffset}}";
-		var xhr = new XMLHttpRequest();
-		xhr.open("POST", window.location.origin + "/graphql", true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onload = function ()
-		{
-			var r = JSON.parse(xhr.response);
-			if (r.data === null){return;}
-			memlocs = r.data.memlocs;
-			console.log(memlocs);
-			for (let i = 0; i < memlocs.length; ++i)
-			{
-				var row = element_tbody.insertRow(0);
-				var cell;
-
-				cell = row.insertCell(-1);
-				cell.innerText = memlocs[i].id;
-
-				cell = row.insertCell(-1);
-				cell.innerText = memlocs[i].producer_id;
-
-				cell = row.insertCell(-1);
-				cell.innerText = "quantity";
-
-				//cell = row.insertCell(0);
-				//cell.innerText = memlocs[i].layout_id;
-
-				cell = row.insertCell(-1);
-				cell.innerText = memlocs[i].byteoffset;
-
-				cell = row.insertCell(-1);
-				{
-					let e = document.createElement("input");
-					e.setAttribute("type", "text");
-					e.setAttribute("value", "0");
-					cell.appendChild(e);
-					element_inputs.push(e);
-				}
-
-				cell = row.insertCell(-1);
-				cell.innerText = 0;
-				element_hexs.push();
-			}
-
-		};
-		xhr.onerror = function()
-		{
-			console.log("XHR unknown error. Probobly Cross-Origin Request Blocked");
-		}
-		var data = JSON.stringify({"query": query});
-		xhr.send(data);
-	}
-
-
-	function pub()
-	{
-		var buffer = new ArrayBuffer(100);
-		const view = new DataView(buffer);
-		console.log(memlocs);
-		console.log(element_inputs);
-		view.setInt32(0, layout_id);
-		for (let i = 0; i < memlocs.length; ++i)
-		{
-			var value = Number(element_inputs[i].value);
-			console.log(value);
-			view.setFloat32(memlocs[i].byteoffset, value);
-		}
-		console.log(view, buffer);
-		socket.send(buffer);
-	}
-
-
-
-
-
-
-
-	function ws_connect(url)
-	{
-		console.log("WebSocket open:", url);
-		socket = new WebSocket(url);
-		socket.binaryType = "arraybuffer";
-		socket.onopen = function (event)
-		{
-			console.log("WebSocket onopen: ", url, event);
-		};
-		socket.onclose = function (event)
-		{
-			console.log("WebSocket onclose: ", event);
-		};
-		socket.onerror = function (event)
-		{
-			console.warn("WebSocket onerror: ", event);
-			//element_output.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
-		};
-		socket.onmessage = function (event)
-		{
-			console.warn("WebSocket onmessage: ", event);
-		};
-		return socket;
-	};
-
-
-
-	var url = ws_url("/ws/pub");
-var socket = ws_connect(url);
-
-
-
-
-
-
-
-
-
-
-
-</script>
 </body>
 </html>
 
