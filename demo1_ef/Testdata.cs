@@ -127,6 +127,8 @@ namespace Demo
 					new Memloc { id = 6, layout_id = 4, producer_id = 2, byteoffset = 12 },
 					new Memloc { id = 7, layout_id = 4, producer_id = 3, byteoffset = 16 },
 					new Memloc { id = 8, layout_id = 4, producer_id = 4, byteoffset = 20 },
+					new Memloc { id = 9, layout_id = 4, producer_id = 11, byteoffset = 24 },
+					new Memloc { id = 10, layout_id = 4, producer_id = 12, byteoffset = 28 },
 				};
 				context.memlocs.AddRange(records);
 			}

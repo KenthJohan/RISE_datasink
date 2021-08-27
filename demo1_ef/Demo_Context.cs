@@ -71,6 +71,7 @@ namespace Demo
 			builder.Entity<Floatval>().HasKey(u => new{u.time,u.producer_id});
 			builder.Entity<Floatval>().Property(b => b.longitude).HasDefaultValueSql("0.0");
 			builder.Entity<Floatval>().Property(b => b.latitude).HasDefaultValueSql("0.0");
+			builder.Entity<Floatval>().Property(b => b.time).HasDefaultValueSql("now()");
 		}
 	}
 

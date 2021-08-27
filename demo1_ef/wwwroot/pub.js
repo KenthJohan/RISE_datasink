@@ -1,6 +1,5 @@
 
 var e_table_bytes = document.getElementById("bytes");
-var e_tr_bytes;
 var element_tbody = document.getElementById("tbody");
 var element_button_pub = document.getElementById("pub");
 var element_inputs = [];
@@ -8,7 +7,8 @@ var element_hexs = [];
 var element_hexs2 = [];
 var layout_id = 4;
 var socket;
-var sendbuffer = new ArrayBuffer(100);
+let sendbuffer = null;
+let subs = [];
 /*
 
 	public int id { get; set; }
@@ -19,40 +19,50 @@ var sendbuffer = new ArrayBuffer(100);
 */
 
 
-function show_byte_array(memlocs)
+function show_byte_array(memlocs, length, etable)
 {
-	var row1 = e_table_bytes.insertRow(-1);
-	e_tr_bytes = e_table_bytes.insertRow(-1);
-	var row3 = e_table_bytes.insertRow(-1);
-	for (let i = 0; i < 50; ++i)
+	assert(memlocs instanceof Array);
+	assert(etable instanceof HTMLElement);
+	var row1 = etable.insertRow(-1);
+	etable._row_hex = etable.insertRow(-1);
+	var row0 = etable.insertRow(-1);
+	var row3 = etable.insertRow(-1);
+	for (let i = 0; i < length; ++i)
 	{
 		var cell;
 		cell = row1.insertCell(-1);
 		cell.innerText = String(i).padStart(2, '0');
-		cell = e_tr_bytes.insertCell(-1);
+		cell = etable._row_hex.insertCell(-1);
 		cell.innerText = String(0).padStart(2, '0');
 	}
 	
 	let j = 0;
 	let i;
-	for (i = 0; i < 50; ++i)
+	for (i = 0; i < length; ++i)
 	{
 		var cell;
 		if (memlocs[j].byteoffset == i)
 		{
+			cell = row0.insertCell(-1);
+			cell.colSpan = 4;
+			cell.innerText = String(memlocs[j].id);
+			cell.style.backgroundColor = random_hsla(""+j);
+			cell.style.textAlign = "center";
 			cell = row3.insertCell(-1);
 			cell.colSpan = 4;
-			cell.innerText = String(i).padStart(2, '0');
+			cell.innerText = "0";
 			element_hexs2[j] = cell;
 		}
 		if (memlocs[j].byteoffset <= i && memlocs[j].byteoffset <= i+3)
 		{
-			row1.cells[i].style.backgroundColor = random_hsla(""+j);
+			//row1.cells[i].style.backgroundColor = random_hsla(""+j);
 		}
 		else
 		{
+			cell = row0.insertCell(-1);
+			cell.innerText = "";
 			cell = row3.insertCell(-1);
-			cell.innerText = String(i).padStart(2, '0');
+			cell.innerText = "";
 		}
 		if (memlocs[j].byteoffset+3 <= i)
 		{
@@ -60,16 +70,20 @@ function show_byte_array(memlocs)
 		}
 		if (j >= memlocs.length){i++;break;}
 	}
-	for (; i < 50; ++i)
+	for (; i < length; ++i)
 	{
+		cell = row0.insertCell(-1);
+		cell.innerText = "";
 		cell = row3.insertCell(-1);
-		cell.innerText = String(i).padStart(2, '0');
+		cell.innerText = "";
 	}
 }
 
 
 function show_inputs(memlocs)
 {
+	assert(memlocs instanceof Array);
+	//assert(etable instanceof HTMLElement);
 	for (let i = 0; i < memlocs.length; ++i)
 	{
 		var row = element_tbody.insertRow(-1);
@@ -79,6 +93,20 @@ function show_inputs(memlocs)
 		cell.style.backgroundColor = random_hsla(""+i);
 		cell = row.insertCell(-1);
 		cell.innerText = memlocs[i].producer_id;
+		cell.onclick = (x) => 
+		{
+			var j = subs.indexOf(x.target.innerText);
+			if (j >= 0)
+			{
+				subs.splice(j, 1);
+			}
+			else
+			{
+				subs.push(x.target.innerText);
+			}
+			document.getElementById('iframe').src = "/subscribe.html#a,"+subs.join(",");
+			console.log(subs, j, x.target.innerText, document.getElementById('iframe').src);
+		}
 		cell = row.insertCell(-1);
 		cell.innerText = memlocs[i].producer.quantity.name
 		//cell = row.insertCell(0);
@@ -93,7 +121,7 @@ function show_inputs(memlocs)
 			e.onchange = (x) => 
 			{
 				update_buffer(sendbuffer, layout_id, memlocs, element_inputs);
-				showhex2(sendbuffer, e_tr_bytes);
+				showhex2(sendbuffer, e_table_bytes._row_hex);
 				showhex(memlocs);
 			}
 			cell.appendChild(e);
@@ -119,7 +147,7 @@ function showhex(memlocs)
 		//console.log(value);
 		view.setFloat32(0, value);
 		element_hexs[i].innerText = buf2hex(buffer);
-		element_hexs2[i].innerText = value;
+		element_hexs2[i].innerText = value.toPrecision(6);
 	}
 }
 
@@ -140,11 +168,12 @@ function update_buffer(buf, layout_id, memlocs, inputs)
 // Pure function
 function showhex2(buf, tr)
 {
+	assert(buf instanceof ArrayBuffer);
+	assert(tr instanceof HTMLElement);
 	var u = new Uint8Array(buf)
-	//console.log(e_tr_bytes.cells);
 	for (let i = 0; i < tr.cells.length; ++i)
 	{
-		tr.cells[i].innerText = u[i].toString(16);
+		tr.cells[i].innerText = u[i].toString(16).toUpperCase();
 	}
 }
 
@@ -152,9 +181,9 @@ function showhex2(buf, tr)
 // Side effect
 function pub(memlocs)
 {
-	var buffer = new ArrayBuffer(100);
+	var bytesize = memlocs[memlocs.length-1].byteoffset + 4;
+	var buffer = new ArrayBuffer(bytesize);
 	const view = new DataView(buffer);
-	//console.log(memlocs);
 	//console.log(element_inputs);
 	view.setInt32(0, layout_id);
 	for (let i = 0; i < memlocs.length; ++i)
@@ -163,7 +192,8 @@ function pub(memlocs)
 		//console.log(value);
 		view.setFloat32(memlocs[i].byteoffset, value);
 	}
-	console.log(view, buffer);
+	//console.log(view, buffer);
+	console.log("Sending: ", buf2hex(buffer));
 	socket.send(buffer);
 }
 
@@ -211,8 +241,10 @@ function ws_connect(url)
 		if (r.data === null){return;}
 		let memlocs = r.data.memlocs;
 		console.log(memlocs);
+		var bytesize = memlocs[memlocs.length-1].byteoffset + 4;
+		sendbuffer = new ArrayBuffer(bytesize);
 		show_inputs(memlocs);
-		show_byte_array(memlocs);
+		show_byte_array(memlocs, sendbuffer.byteLength, e_table_bytes);
 		element_button_pub.onclick = (x) => {pub(memlocs)};
 	};
 	xhr.onerror = function()

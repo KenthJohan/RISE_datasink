@@ -70,25 +70,27 @@ namespace Demo
 
 		// |byte0|byte1|byte2|byte3|byte4|byte5|byte6|byte7|etc    |
 		// |        layout_id      |                               |
-		//https://github.com/npgsql/npgsql/issues/2779
+		// https://github.com/npgsql/npgsql/issues/2779
+		// High frequency function, must be perfomant.
+		// 1000 sensors * 100hz
+		// 1Mhz = 100Hz * (10000 floats)
 		public static void recv(ReadOnlySpan<byte> buffer)
 		{
 			//"INSERT INTO floatvals (producer_id,time,value) VALUES (@producer_id, @time, @value)"
-			using var importer = DB.connection.BeginBinaryImport("COPY floatvals (producer_id, time, value) FROM STDIN (FORMAT binary)");
+			using var importer = DB.connection.BeginBinaryImport("COPY floatvals (producer_id, value) FROM STDIN (FORMAT binary)");
 			int layout_id = BinaryPrimitives.ReadInt32BigEndian(buffer.Slice(0));
 			foreach(Memloc memloc in dict_memlocs[layout_id])
 			{
 				//Debug.Assert(memloc.byteoffset > 3);
 				importer.StartRow();
-				int producer_id = memloc.producer_id;
-				DateTime time = DateTime.Now;
+				//DateTime time = DateTime.Now;
 				float value = BinaryPrimitives.ReadSingleBigEndian(buffer.Slice(memloc.byteoffset));
-				importer.Write(producer_id);
-				importer.Write(time);
+				importer.Write(memloc.producer_id);
+				//importer.Write(time);
 				importer.Write(value);
 				//importer.Write(0.0f);
 				//importer.Write(0.0f);
-				Subs.publish(producer_id, time, value);
+				Subs.publish(memloc.producer_id, DateTime.Now, value);
 			}
 			ulong r = importer.Complete();
 			log.Information("importer.Complete(): {r}", r);

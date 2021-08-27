@@ -94,18 +94,25 @@ namespace Demo
 				{
 					subs1[message.producer_id] = new HashSet<WebSocket>();
 				}
-				if (subs0[ws].Contains(message.producer_id))
+
+				switch(message.mode)
 				{
-					log.Information("WebSocket {ws} unsubscribes {producer_id}", ws.GetHashCode(), message.producer_id);
-					subs0[ws].Remove(message.producer_id);
-					subs1[message.producer_id].Remove(ws);
+					case 0:
+						log.Information("WebSocket {ws} unsubscribes {producer_id}", ws.GetHashCode(), message.producer_id);
+						subs0[ws].Remove(message.producer_id);
+						subs1[message.producer_id].Remove(ws);
+						break;
+					case 1:
+						log.Information("WebSocket {ws} subscribes {producer_id}", ws.GetHashCode(), message.producer_id);
+						subs0[ws].Add(message.producer_id);
+						subs1[message.producer_id].Add(ws);
+						break;
+					default:
+						log.Warning("This mode {mode} is not implemented", message.mode);
+						break;
 				}
-				else
-				{
-					log.Information("WebSocket {ws} subscribes {producer_id}", ws.GetHashCode(), message.producer_id);
-					subs0[ws].Add(message.producer_id);
-					subs1[message.producer_id].Add(ws);
-				}
+
+
 				//log.Information("WebSocket {ws} loop. WebSocket count {count}. {@Subscription_Message}", ws.GetHashCode(), subscriptions.Count, message);
 				//Echo websocket message:
 				//await ws.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);

@@ -8,8 +8,7 @@ namespace Demo
 	public unsafe struct Msg_Float
 	{
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-		[FieldOffset(0)]
-		public fixed byte data[16];
+		[FieldOffset(0)] public fixed byte data[16];
 		[FieldOffset(0)] public Int32 producer_id;
 		[FieldOffset(4)] public Int64 time;
 		[FieldOffset(12)] public float value;
@@ -30,11 +29,9 @@ namespace Demo
 	[StructLayout(LayoutKind.Explicit, Pack = 1)]
 	public unsafe struct Msg_Sub
 	{
-		[FieldOffset(0)]
-		public fixed byte data[4];
-
-		[FieldOffset(0)]
-		public Int32 producer_id;
+		[FieldOffset(0)] public fixed byte data[8];
+		[FieldOffset(0)] public Int32 producer_id;
+		[FieldOffset(4)] public Int32 mode;
 
 		public unsafe static Msg_Sub FromBytes(byte[] data)
 		{

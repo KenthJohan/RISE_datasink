@@ -8,9 +8,7 @@
 <style>
 body
 {
-	display: flex;
 	background-color: whitesmoke;
-	gap: 12px;
 }
 #plot
 {
@@ -27,6 +25,7 @@ body
 	</p>
 	<p><input type="submit" value="Toggle subscription"></p>
 </form>
+
 
 <div id="plot"></div>
 
@@ -55,14 +54,11 @@ var interval = setInterval(function()
 
 
 
-var element_output = document.getElementById("out");
-var element_form = document.getElementById("form");
-var element_plot = document.getElementById("plot");
+const element_output = document.getElementById("out");
+const element_form = document.getElementById("form");
+const element_plot = document.getElementById("plot");
 
-
-
-
-var layout = 
+const layout = 
 {
 	showlegend: true,
 };
@@ -71,11 +67,15 @@ Plotly.newPlot(element_plot, [], layout);
 //console.log(element_plot);
 
 
-function ws_togglesub(socket, producer_id)
+function ws_sub(socket, producer_id, mode)
 {
-	var buffer = new ArrayBuffer(4);
+	assert(socket instanceof WebSocket);
+	assert(Number.isInteger(producer_id));
+	assert(Number.isInteger(mode));
+	var buffer = new ArrayBuffer(8);
 	var dv = new DataView(buffer);
-	dv.setInt16(0, producer_id, true);
+	dv.setInt32(0, producer_id, true);
+	dv.setInt32(4, mode, true);
 	console.log("Websocket send: ", buf2hex(buffer), " to ", socket.url);
 	socket.send(buffer);
 }
@@ -86,14 +86,17 @@ function ws_togglesub(socket, producer_id)
 //When method = 2: Toggle subscription
 function subscribe(socket, producer_id, longname, method)
 {
+	assert(socket instanceof WebSocket);
+	assert(Number.isInteger(producer_id));
+	assert(Number.isInteger(method));
 	//Check if this is already subscribed:
-	var trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
+	const trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
 	if (trace_index >= 0)
 	{
 		if ((method == 2) || (method == 0))
 		{
 			Plotly.deleteTraces(element_plot, trace_index);
-			ws_togglesub(socket, producer_id);
+			ws_sub(socket, producer_id, 0);
 			console.log("Unsubscribe", producer_id, trace_index);
 		}
 		else
@@ -103,7 +106,7 @@ function subscribe(socket, producer_id, longname, method)
 	}
 	else if ((method == 2) || (method == 1))
 	{
-		ws_togglesub(socket, producer_id);
+		ws_sub(socket, producer_id, 1);
 		var trace =
 		{
 			visible: true,
@@ -111,7 +114,7 @@ function subscribe(socket, producer_id, longname, method)
 			y: [null],
 			name: longname ? longname : ("Producer " + producer_id),
 			type: 'scatter',
-			producer_id: producer_id
+			producer_id: producer_id //Custom field. Does not belong to Plotly.
 		};
 		console.log("Subscribe", producer_id, trace_index);
 		Plotly.addTraces(element_plot, trace);
@@ -132,13 +135,7 @@ function ws_connect(url)
 	socket.onopen = function (event)
 	{
 		console.log("WebSocket onopen: ", url, event);
-		/*
-		var buffer = new ArrayBuffer(4);
-		var dv = new DataView(buffer);
-		dv.setInt16(0, producer_id, true);
-		console.log("Sending:", buf2hex(buffer));
-		socket.send(buffer);
-		*/
+		hashchange1();
 	};
 	socket.onclose = function (event)
 	{
@@ -152,23 +149,15 @@ function ws_connect(url)
 	socket.onmessage = function (event)
 	{
 		const view = new DataView(event.data);
-		//console.log(view);
-		console.log(buf2hex(event.data), view.getInt32(0, true), new Date(Number(view.getBigInt64(4, true))), view.getFloat32(12, true));
-		//console.log(new Date(Number(view.getBigInt64(4, true))));
-		var producer_id = view.getInt32(0, true);
-		var time = new Date(Number(view.getBigInt64(4, true)));
-		var value = view.getFloat32(12, true);
-		var trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
+		const producer_id = view.getInt32(0, true);
+		const time = new Date(Number(view.getBigInt64(4, true)));
+		const value = view.getFloat32(12, true);
+		console.log(buf2hex(event.data), producer_id, time, value);
+		const trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
 		Plotly.extendTraces('plot', {
 			x: [[time.toISOString()]],
 			y: [[value]]
 		}, [trace_index]);
-		/*
-		Plotly.extendTraces('plot', {
-			x: [[rand()]],
-			y: [[rand()]]
-		}, [0]);
-		*/
 	};
 	return socket;
 };
@@ -178,24 +167,57 @@ function ws_connect(url)
 var url = ws_url("/ws/sub");
 var socket = ws_connect(url);
 
+
+
 element_form.onsubmit = (event) =>
 {
-	var producer_id = Number(event.target.producer_id.value);
-	var producer_longname = event.target.producer_id.querySelector('option[value="'+producer_id+'"]').innerText;
 	event.preventDefault();
-	subscribe(socket, producer_id, producer_longname, 2);
-	//ws_connect(event.target.producer_id.value);
-	/*
-	Plotly.addTraces('plot', 
+	const producer_id = Number(event.target.producer_id.value);
+	const producer_longname = event.target.producer_id.querySelector('option[value="'+producer_id+'"]').innerText;
+	//Fuckery:
+	var f = location.hash.substring(1).split(",");
+	if (f[0] == ""){f = [];}
+	var i = f.indexOf(""+producer_id);
+	if (i >= 0)
 	{
-		x: [],
-		y: [],
-		mode: 'lines',
-		line: {color: '#80CA06'}
-	});
-	*/
+		f.splice(i, 1);
+	}
+	else
+	{
+		f.push(""+producer_id);
+	}
+	location.hash = f.join(",");
 }
 
+function hashchange1()
+{
+	var f = location.hash.substring(1).split(",");
+	console.log(f);
+	if (f.includes('a'))
+	{
+		element_form.remove(); 
+	}
+	for(let i = 0; i < element_plot.data.length; ++i)
+	{
+		let producer_id = element_plot.data[i].producer_id;
+		if (producer_id && (f.includes(producer_id) == false))
+		{
+			subscribe(socket, Number(producer_id), "", 0);
+		}
+	}
+	for(let i = 0; i < f.length; ++i)
+	{
+		if (f[i] == ""){continue;}//Fuckery
+		var j = Number(f[i]);
+		if (isNaN(j) == false)
+		{
+			console.log(j, f[i]);
+			subscribe(socket, Number(j), "", 1);
+		}
+	}
+}
+
+window.addEventListener('hashchange', hashchange1, false);
 
 
 
