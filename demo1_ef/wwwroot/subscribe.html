@@ -97,7 +97,7 @@ function subscribe(socket, producer_id, longname, method)
 		{
 			Plotly.deleteTraces(element_plot, trace_index);
 			ws_sub(socket, producer_id, 0);
-			console.log("Unsubscribe", producer_id, trace_index);
+			console.log("Unsubscribe: " + producer_id + ". Delete trace: " +  trace_index);
 		}
 		else
 		{
@@ -116,8 +116,9 @@ function subscribe(socket, producer_id, longname, method)
 			type: 'scatter',
 			producer_id: producer_id //Custom field. Does not belong to Plotly.
 		};
-		console.log("Subscribe", producer_id, trace_index);
 		Plotly.addTraces(element_plot, trace);
+		const trace_index = element_plot.data.findIndex(x => x.producer_id === producer_id);
+		console.log("Subscribe: " + producer_id + ". Adding trace: " + trace_index);
 	}
 }
 
@@ -200,7 +201,7 @@ function hashchange1()
 	for(let i = 0; i < element_plot.data.length; ++i)
 	{
 		let producer_id = element_plot.data[i].producer_id;
-		if (producer_id && (f.includes(producer_id) == false))
+		if (f.includes(""+producer_id) == false)
 		{
 			subscribe(socket, Number(producer_id), "", 0);
 		}
@@ -211,7 +212,6 @@ function hashchange1()
 		var j = Number(f[i]);
 		if (isNaN(j) == false)
 		{
-			console.log(j, f[i]);
 			subscribe(socket, Number(j), "", 1);
 		}
 	}

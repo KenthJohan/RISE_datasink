@@ -87,22 +87,25 @@ function show_inputs(memlocs)
 	for (let i = 0; i < memlocs.length; ++i)
 	{
 		var row = element_tbody.insertRow(-1);
-		var cell;
+		let cell;
 		cell = row.insertCell(-1);
 		cell.innerText = memlocs[i].id;
 		cell.style.backgroundColor = random_hsla(""+i);
 		cell = row.insertCell(-1);
 		cell.innerText = memlocs[i].producer_id;
+		cell.classList.add("cell");
 		cell.onclick = (x) => 
 		{
 			var j = subs.indexOf(x.target.innerText);
 			if (j >= 0)
 			{
 				subs.splice(j, 1);
+				x.target.classList.remove("active");
 			}
 			else
 			{
 				subs.push(x.target.innerText);
+				x.target.classList.add("active");
 			}
 			document.getElementById('iframe').src = "/subscribe.html#a,"+subs.join(",");
 			console.log(subs, j, x.target.innerText, document.getElementById('iframe').src);
