@@ -12,13 +12,9 @@ namespace Demo
 	{
 		private static readonly ILogger log = Log.ForContext(typeof(Program));
 
-
-
-
 		public static void Main(string[] args)
 		{
 			Password.assert_salthash();
-
 
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console(applyThemeToRedirectedOutput: true)

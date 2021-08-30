@@ -1,8 +1,6 @@
 using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.IO;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 public static class Password
 {
@@ -17,7 +15,7 @@ public static class Password
 	//   sn:
 	//     The number of cryptographically strong sequence of random values for salt part. Must by atleast 8.
 	//   pn:
-	//     The number of pseudo-random key bytes to generate for hash part. Must by atleast positive.
+	//     The number of pseudo-random key bytes to generate for hash part. Must be positive.
 	//   n:
 	//     The number of iterations for the operation.
 	//
@@ -38,22 +36,22 @@ public static class Password
 
 	//
 	// Summary:
-	//     Compares as raw password with a hashed password in format (Salt,Hash)
+	//     Compares raw password with hashed password.
 	//
 	// Parameters:
 	//   pwhash:
-	//     The hashed password to compare.
+	//     The salt and hashed password to compare. (Salt, Hash) = (S1, S2, ... sn, H1, H2, ... pn)
 	//   password:
 	//     The raw password to compare.
 	//   sn:
 	//     The number of cryptographically strong sequence of random values. Must by atleast 8.
 	//   pn:
-	//     The number of pseudo-random key bytes to generate. Must by atleast positive.
+	//     The number of pseudo-random key bytes to generate. Must be positive.
 	//   n:
 	//     The number of iterations for the operation.
 	//
 	// Returns:
-	//     A byte array of salt and hashed password values
+	//     Matched or not matched password
 	public static bool salthash_verify(string password, byte[] pwhash, int sn, int pn, int n)
 	{
 		byte[] salt = new byte[sn];
