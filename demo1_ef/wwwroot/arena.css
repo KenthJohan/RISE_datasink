@@ -1,7 +1,31 @@
-input,select
+body
+{
+	background-color: rgb(49, 49, 49);
+	color:rgb(196, 196, 196);
+	font-family: Arial, Helvetica, sans-serif;
+}
+header
+{
+	font-size: 20px;
+	padding: 10px;
+}
+header > strong
+{
+	font-size: 30px;
+}
+input
 {
 	width: 400px;
+	padding: 10px;
 }
+button
+{
+	display: block;
+	padding:10px;
+	width: 100%;
+}
+
+
 
 input:invalid
 {
@@ -10,17 +34,13 @@ input:invalid
 
 legend
 {
-    padding: 3px 6px;
+	padding: 3px 6px;
 }
 
-
-body
-{
-	/*font: 1rem 'Fira Sans', sans-serif;*/
-}
 
 table
 {
+	color:#000;
 	/*margin:20px;*/
 	border-collapse: collapse;
 	background-color: rgb(241, 239, 236);

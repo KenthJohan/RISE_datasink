@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Datasink - Overview</title>
+	<link rel="stylesheet" type="text/css" href="arena.css"/>
+	<style>
+		
+	</style>
+</head>
+<body>
+
+	<header>Overview</header>
+	<hr>
+	
+	<div style="display: flex; gap: 12px;">
+		<table id="t1">
+		</table>
+		<table id="t2">
+		</table>
+		<table id="t3">
+		</table>
+		<table id="t4">
+		</table>
+		<table id="t5">
+		</table>
+		<table id="t6">
+		</table>
+		<table id="t7">
+		</table>
+	</div>
+
+
+<script src='basic.js'></script>
+<script src='add.js'></script>
+<script>
+{
+var config = {};
+config.title = 'Projects';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t1'), '', config);
+config.title = 'Quantities';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t2'), '', config);
+config.title = 'Producers';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t3'), '', config);
+config.title = 'Locations';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t4'), '', config);
+config.title = 'Users';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t5'), '', config);
+config.title = 'Memlocs';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t6'), '', config);
+config.title = 'Layouts';
+config.columns = ['id', 'name'];
+build_table(document.getElementById('t7'), '', config);
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 const assert = function(condition, message)
 {
-    if (condition === false)
+	if (condition === false)
 	{
 		throw Error('Assert failed: ' + (message || ''));
 	}
@@ -16,13 +16,15 @@ function ws_url(postfix)
 }
 
 
-function table_insert_th(tr) {
+function table_insert_th(tr)
+{
 	var th = document.createElement('th');
 	tr.appendChild(th);
 	return th;
 }
 
-function formatdate(t) {
+function formatdate(t)
+{
 	var Y = t.getFullYear();
 	var M = t.getMonth();
 	var D = t.getDate();
@@ -34,10 +36,13 @@ function formatdate(t) {
 
 
 
-function template(text, data) {
-	return text.replace(
+function template(text, data)
+{
+	return text.replace
+	(
 		/{(\w*)}/g, // or /{(\w*)}/g for "{this} instead of %this%"
-		function (m, key) {
+		function (m, key)
+		{
 			return data.hasOwnProperty(key) ? data[key] : "";
 		}
 	);
@@ -45,11 +50,13 @@ function template(text, data) {
 
 
 
-function xmur3(str) {
+function xmur3(str)
+{
 	for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
 		h = Math.imul(h ^ str.charCodeAt(i), 3432918353),
 			h = h << 13 | h >>> 19;
-	return function () {
+	return function ()
+	{
 		h = Math.imul(h ^ h >>> 16, 2246822507);
 		h = Math.imul(h ^ h >>> 13, 3266489909);
 		return (h ^= h >>> 16) >>> 0;
@@ -57,8 +64,10 @@ function xmur3(str) {
 }
 
 
-function sfc32(a, b, c, d) {
-	return function () {
+function sfc32(a, b, c, d)
+{
+	return function ()
+	{
 		a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
 		var t = (a + b) | 0;
 		a = b ^ b >>> 9;
@@ -72,8 +81,10 @@ function sfc32(a, b, c, d) {
 }
 
 
-function mulberry32(a) {
-	return function () {
+function mulberry32(a)
+{
+	return function ()
+	{
 		var t = a += 0x6D2B79F5;
 		t = Math.imul(t ^ t >>> 15, t | 1);
 		t ^= t + Math.imul(t ^ t >>> 7, t | 61);
@@ -82,7 +93,8 @@ function mulberry32(a) {
 }
 
 
-function xoshiro128ss(a, b, c, d) {
+function xoshiro128ss(a, b, c, d)
+{
 	return function () {
 		var t = b << 9, r = a * 5; r = (r << 7 | r >>> 25) * 9;
 		c ^= a; d ^= b;
@@ -93,8 +105,10 @@ function xoshiro128ss(a, b, c, d) {
 }
 
 
-function jsf32(a, b, c, d) {
-	return function () {
+function jsf32(a, b, c, d)
+{
+	return function ()
+	{
 		a |= 0; b |= 0; c |= 0; d |= 0;
 		var t = a - (b << 27 | b >>> 5) | 0;
 		a = b ^ (c << 17 | c >>> 15);
@@ -160,7 +174,18 @@ function gql_floatval_add(value, onload)
 
 
 
-
+function gql_formdata_string(formdata)
+{
+	var str = '';
+	//console.log(formdata.entries());
+	for(var pair of formdata.entries())
+	{
+		//console.log(pair[0]+ ', '+ pair[1]);
+		str += pair[0] + ':"' + pair[1] + '",';
+	}
+	str = str.slice(0,-1)
+	return str;
+}
 
 
 

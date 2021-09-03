@@ -134,18 +134,7 @@ function submit_callback(event)
 
 {
 
-	function gql_formdata_string(formdata)
-	{
-		var str = '';
-		//console.log(formdata.entries());
-		for(var pair of formdata.entries())
-		{
-			//console.log(pair[0]+ ', '+ pair[1]);
-			str += pair[0] + ':"' + pair[1] + '",';
-		}
-		str = str.slice(0,-1)
-		return str;
-	}
+
 
 	function submit(event)
 	{
@@ -181,5 +170,108 @@ function submit_callback(event)
 	for (let i = 0; i < elements_form.length; ++i)
 	{
 		elements_form[i].addEventListener('submit', submit);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function build_column_th(tr, column)
+{
+	var th;
+	switch(column)
+	{
+	case 'id':
+		th = document.createElement("th");
+		th.textContent = "id";
+		tr.appendChild(th);
+		break;
+	case 'name':
+		th = document.createElement("th");
+		th.textContent = "name";
+		tr.appendChild(th);
+		break;
+	}
+}
+
+function build_column(tr, column, a)
+{
+	var td;
+	switch(column)
+	{
+	case 'id':
+		td = tr.insertCell(-1);
+		td.textContent = a;
+		td.style.width = "30px";
+		break;
+	case 'name':
+		td = tr.insertCell(-1);
+		td.textContent = a;
+		td.style.width = "30px";
+		break;
+	}
+}
+
+
+
+function build_table(destination, q, config)
+{
+	
+	{
+		var thead = document.createElement('thead');
+		var tr = thead.insertRow(-1);
+		var th = document.createElement("th");
+		th.colSpan = 100;
+		th.textContent = config.title;
+		tr.appendChild(th);
+		destination.appendChild(thead);
+	}
+
+	{
+		var thead = document.createElement('thead');
+		var tr = thead.insertRow(-1);
+		for(var i = 0; i < config.columns.length; ++i)
+		{
+			build_column_th(tr, config.columns[i]);
+		}
+		destination.appendChild(thead);
+	}
+
+	{
+		var tbody = document.createElement('tbody');
+		for(var r = 0; r < 4; ++r)
+		{
+			var tr = tbody.insertRow(-1);
+			for(var c = 0; c < config.columns.length; ++c)
+			{
+				build_column(tr, config.columns[c], r);
+			}
+		}
+		destination.appendChild(tbody);
 	}
 }

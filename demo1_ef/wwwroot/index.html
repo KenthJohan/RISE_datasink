@@ -3,50 +3,75 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Datasink by RISE</title>
+	<link rel="stylesheet" type="text/css" href="arena.css"/>
 	<style>
-		body
-		{
-			align-content: center;
-			background-color: rgb(49, 49, 49);
-			margin-left: auto;
-			margin-right: auto;
-			text-align: center;
-			color:rgb(196, 196, 196);
-		}
-		label
-		{
-			width:200px;
-			display: inline-block;
-		}
+		
 	</style>
 </head>
 <body>
 
-	<h1>Login</h1>
+	<header><strong>Datasink</strong> developed by RISE</header>
+	<hr>
+	
 	<form id="login" graphql_mutation="user_login" callback="callback_login">
-		<label for="email">Email</label>
-		<input name="email" type="text"/><br><br>
-		<label for="password">Password</label>
-		<input name="password" type="text"/><br><br>
-		<button type="submit">Login</button><br><br>
+		<table>
+		<thead>
+			<tr>
+				<th colspan="2"><header>Login</header></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Email</td>
+				<td><input name="email" type="text"/></td>
+			</tr>
+			<tr>
+				<td>Password</td>
+				<td><input name="password" type="text"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button type="submit">Login</button></td>
+			</tr>
+		</tbody>
+		</table>
 	</form>
 	<hr>
 
-	<h1>Register</h1>
+	
 	<form id="register" graphql_mutation="user_register" callback="callback_register">
-		<label for="email">Email</label>
-		<input name="email" type="text"/><br><br>
-		<label for="password">Password</label>
-		<input name="password" type="text"/><br><br>
-		<label for="allowpw">allowpw</label>
-		<input name="allowpw" type="text"/><br><br>
-		<button type="submit">Register</button><br><br>
+		<table>
+		<thead>
+			<tr>
+				<th colspan="2"><header>Register</header></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Email</td>
+				<td><input name="email" type="text"/></td>
+			</tr>
+			<tr>
+				<td>Password</td>
+				<td><input name="password" type="text"/></td>
+			</tr>
+			<tr>
+				<td>allowpw</td>
+				<td><input name="allowpw" type="text"/></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button type="submit">Register</button></td>
+			</tr>
+		</tbody>
+		</table>
 	</form>
+	<hr>
 
 	<p id="log"></p>
 
 
-
+<script src='basic.js'></script>
 <script src='add.js'></script>
 <script>
 
@@ -60,6 +85,7 @@
 	function callback_login(s)
 	{
 		console.log(s);
+		window.location.href = '/overview.html';
 	}
 	function callback_register(s)
 	{
