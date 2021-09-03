@@ -65,6 +65,7 @@ namespace Demo
 			if (string.IsNullOrEmpty(email)){throw new QueryException(ErrorBuilder.New().SetMessage("The email cannot be empty.").SetCode("EMAIL_EMPTY").Build());}
 			if (string.IsNullOrEmpty(password)){throw new QueryException(ErrorBuilder.New().SetMessage("The password cannot be empty.").SetCode("PASSWORD_EMPTY").Build());}
 			User user = context.users.FirstOrDefault(u => u.email == email);
+			if (user == null){return null;}
 			bool success = PW.salthash_verify(password, user.pwhash);
 			if (success)
 			{

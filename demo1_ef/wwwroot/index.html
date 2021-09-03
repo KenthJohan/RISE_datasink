@@ -1,33 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title></title>
-    <style>
-    </style>
+	<meta charset="utf-8" />
+	<title>Datasink by RISE</title>
+	<style>
+		body
+		{
+			align-content: center;
+			background-color: rgb(49, 49, 49);
+			margin-left: auto;
+			margin-right: auto;
+			text-align: center;
+			color:rgb(196, 196, 196);
+		}
+		label
+		{
+			width:200px;
+			display: inline-block;
+		}
+	</style>
 </head>
 <body>
 
-<h2>Misc</h2>
-<a href="/cms">CMS</a><br>
-<a href="/plotter.html">Plotter</a><br>
-<a href="/osm.html">OSM</a><br>
-<a href="/wslog.html">Log</a><br>
-<a href="/voy.html">GraphQL Voyager</a><br>
-<a href="/graphql">GraphQL Banana Cake Pop</a>
+	<h1>Login</h1>
+	<form id="login" graphql_mutation="user_login" callback="callback_login">
+		<label for="email">Email</label>
+		<input name="email" type="text"/><br><br>
+		<label for="password">Password</label>
+		<input name="password" type="text"/><br><br>
+		<button type="submit">Login</button><br><br>
+	</form>
+	<hr>
+
+	<h1>Register</h1>
+	<form id="register" graphql_mutation="user_register" callback="callback_register">
+		<label for="email">Email</label>
+		<input name="email" type="text"/><br><br>
+		<label for="password">Password</label>
+		<input name="password" type="text"/><br><br>
+		<label for="allowpw">allowpw</label>
+		<input name="allowpw" type="text"/><br><br>
+		<button type="submit">Register</button><br><br>
+	</form>
+
+	<p id="log"></p>
 
 
-<h2>Database</h2>
-<ul>
-	<li><a href="/column">Columns</a></li>
-	<li><a href="/table">Tables</a>
-		<ul>
-			<li><a href="/table/users">Users</a></li>
-			<li><a href="/table/books">Books</a></li>
-		</ul>
-	</li>
-</ul>
 
+<script src='add.js'></script>
+<script>
 
+	const form_login = document.getElementById('login');
+	const form_register = document.getElementById('register');
+	const log = document.getElementById('log');
+
+	//form_login.addEventListener('submit', logSubmit);
+	//form_register.addEventListener('submit', logSubmit);
+
+	function callback_login(s)
+	{
+		console.log(s);
+	}
+	function callback_register(s)
+	{
+		console.log(s);
+	}
+</script>
 </body>
 </html>
