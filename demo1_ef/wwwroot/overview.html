@@ -13,7 +13,7 @@
 	<header>Overview</header>
 	<hr>
 	
-	<div style="display: flex; gap: 12px;">
+	<div style="display: flex; gap: 12px;align-items: flex-start;">
 		<table id="t1">
 		</table>
 		<table id="t2">
@@ -28,36 +28,55 @@
 		</table>
 		<table id="t7">
 		</table>
+		<table id="t8">
+		</table>
 	</div>
 
 
 <script src='basic.js'></script>
 <script src='add.js'></script>
 <script>
+
+var query = `query{
+t1:projects{id name}
+t2:quantities{id name}
+t3:producers{id name}
+t4:locations{id name}
+t5:users{id email}
+t6:memlocs{id}
+t7:layouts{id name}
+t8:devices{id name}
+}`;
+
+
+configs = {};
+configs.t1 = {title:'Projects', columns: ['id', 'name']};
+configs.t2 = {title:'Quantities', columns: ['id', 'name']};
+configs.t3 = {title:'Producers', columns: ['id', 'name']};
+configs.t4 = {title:'Locations', columns: ['id', 'name']};
+configs.t5 = {title:'Users', columns: ['id', 'email']};
+configs.t6 = {title:'Memlocs', columns: ['id']};
+configs.t7 = {title:'Layouts', columns: ['id', 'name']};
+configs.t8 = {title:'Devices', columns: ['id', 'name']};
+
+
+var xhr = new XMLHttpRequest();
+xhr.open("POST", window.location.origin + "/graphql", true);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.onload = function ()
 {
-var config = {};
-config.title = 'Projects';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t1'), '', config);
-config.title = 'Quantities';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t2'), '', config);
-config.title = 'Producers';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t3'), '', config);
-config.title = 'Locations';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t4'), '', config);
-config.title = 'Users';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t5'), '', config);
-config.title = 'Memlocs';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t6'), '', config);
-config.title = 'Layouts';
-config.columns = ['id', 'name'];
-build_table(document.getElementById('t7'), '', config);
+	var response = JSON.parse(xhr.response);
+	if (response.data === null) { return; }
+	build_tables(configs, response.data);
+};
+xhr.onerror = function ()
+{
+	console.log("XHR unknown error. Probobly Cross-Origin Request Blocked");
 }
+var data = JSON.stringify({ "query": query });
+xhr.send(data);
+
+
 </script>
 </body>
 </html>

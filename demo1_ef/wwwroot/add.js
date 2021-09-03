@@ -216,30 +216,47 @@ function build_column_th(tr, column)
 		th.textContent = "name";
 		tr.appendChild(th);
 		break;
+	case 'email':
+		th = document.createElement("th");
+		th.textContent = "email";
+		tr.appendChild(th);
+		break;
 	}
 }
 
-function build_column(tr, column, a)
+function build_column(tr, column, rows, r)
 {
 	var td;
 	switch(column)
 	{
 	case 'id':
 		td = tr.insertCell(-1);
-		td.textContent = a;
+		td.textContent = rows[r].id;
 		td.style.width = "30px";
 		break;
 	case 'name':
 		td = tr.insertCell(-1);
-		td.textContent = a;
+		td.textContent = rows[r].name;
+		td.style.width = "30px";
+		break;
+	case 'email':
+		td = tr.insertCell(-1);
+		td.textContent = rows[r].email;
 		td.style.width = "30px";
 		break;
 	}
 }
 
+function build_tables(configs, data)
+{
+	for (const k in configs)
+	{
+		configs[k].dst = document.getElementById(k);
+		build_table(configs[k], data[k]);
+	}
+}
 
-
-function build_table(destination, q, config)
+function build_table(config, rows)
 {
 	
 	{
@@ -249,7 +266,7 @@ function build_table(destination, q, config)
 		th.colSpan = 100;
 		th.textContent = config.title;
 		tr.appendChild(th);
-		destination.appendChild(thead);
+		config.dst.appendChild(thead);
 	}
 
 	{
@@ -259,19 +276,19 @@ function build_table(destination, q, config)
 		{
 			build_column_th(tr, config.columns[i]);
 		}
-		destination.appendChild(thead);
+		config.dst.appendChild(thead);
 	}
 
 	{
-		var tbody = document.createElement('tbody');
-		for(var r = 0; r < 4; ++r)
+		var tbody = document.createElement('thead');
+		for(var r = 0; r < rows.length; ++r)
 		{
 			var tr = tbody.insertRow(-1);
 			for(var c = 0; c < config.columns.length; ++c)
 			{
-				build_column(tr, config.columns[c], r);
+				build_column(tr, config.columns[c], rows, r);
 			}
 		}
-		destination.appendChild(tbody);
+		config.dst.appendChild(tbody);
 	}
 }

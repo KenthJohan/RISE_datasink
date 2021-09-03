@@ -26,10 +26,12 @@ namespace Demo
 				List<Device> records = new List<Device>
 				{
 					new Device { id = 1, name = "Unknown" },
-					new Device { id = 2, name = "BME280" },
+					new Device { id = 2, name = "ADT7420" },
 					new Device { id = 3, name = "BME280" },
-					new Device { id = 4, name = "BME280" },
-					new Device { id = 5, name = "BME280" }
+					new Device { id = 4, name = "BME680" },
+					new Device { id = 5, name = "BMP388" },
+					new Device { id = 6, name = "DHT" },
+					new Device { id = 7, name = "LM75" },
 				};
 				context.devices.AddRange(records);
 			}
