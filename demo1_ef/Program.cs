@@ -5,6 +5,8 @@ using Serilog.Sinks.SystemConsole.Themes;
 using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading;
 
 namespace Demo
 {
@@ -21,7 +23,10 @@ namespace Demo
 				.WriteTo.Demo_Sink()
 				.CreateBootstrapLogger();
 
+
 			DB.test_psql();
+			Monitor.init();
+			Proc_Reader.test();
 
 			CreateHostBuilder(args)
 				.UseSerilog((context, services, configuration) => configuration

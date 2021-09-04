@@ -69,6 +69,7 @@ namespace Demo
 					new Quantity { id = 7, name = "Current" },
 					new Quantity { id = 8, name = "Power" },
 					new Quantity { id = 9, name = "Voltage" },
+					new Quantity { id = 10, name = "CPU Load" },
 				};
 				context.quantities.AddRange(records);
 			}
