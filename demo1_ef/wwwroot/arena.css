@@ -13,7 +13,7 @@ header > strong
 {
 	font-size: 30px;
 }
-input
+input[type=text]
 {
 	width: 400px;
 	padding: 10px;

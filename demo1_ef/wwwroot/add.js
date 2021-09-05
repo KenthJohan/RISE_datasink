@@ -221,6 +221,18 @@ function build_column_th(tr, column)
 		th.textContent = "email";
 		tr.appendChild(th);
 		break;
+	case 'enable_mqtt':
+		th = document.createElement("th");
+		th.textContent = "MQTT";
+		th.style.writingMode = "vertical-lr";
+		tr.appendChild(th);
+		break;
+	case 'enable_reqget':
+		th = document.createElement("th");
+		th.textContent = "GET";
+		th.style.writingMode = "vertical-lr";
+		tr.appendChild(th);
+		break;
 	}
 }
 
@@ -243,6 +255,24 @@ function build_column(tr, column, rows, r)
 		td = tr.insertCell(-1);
 		td.textContent = rows[r].email;
 		td.style.width = "30px";
+		break;
+	case 'enable_mqtt':
+		var checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+		checkbox.checked = rows[r].enable_mqtt;
+		td = tr.insertCell(-1);
+		td.appendChild(checkbox);
+		break;
+	case 'enable_reqget':
+		var checkbox = document.createElement("input");
+		checkbox.setAttribute("type", "checkbox");
+		checkbox.checked = rows[r].enable_reqget;
+		checkbox.onchange = (x) => 
+		{
+			console.log(x);
+		}
+		td = tr.insertCell(-1);
+		td.appendChild(checkbox);
 		break;
 	}
 }

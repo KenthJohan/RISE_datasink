@@ -69,7 +69,12 @@ namespace Demo
 					new Quantity { id = 7, name = "Current" },
 					new Quantity { id = 8, name = "Power" },
 					new Quantity { id = 9, name = "Voltage" },
+					// /proc/stat
 					new Quantity { id = 10, name = "CPU Load" },
+					// /proc/meminfo
+					new Quantity { id = 11, name = "MemTotal" },
+					new Quantity { id = 12, name = "MemAvailable" },
+					new Quantity { id = 13, name = "MemFree" },
 				};
 				context.quantities.AddRange(records);
 			}
@@ -90,7 +95,10 @@ namespace Demo
 					new Producer { id = 10, name = "Producer 10", quantity_id = 9 },
 					new Producer { id = 11, name = "Producer 11", quantity_id = 4 },
 					new Producer { id = 12, name = "Producer 12", quantity_id = 4 },
-					new Producer { id = 13, name = "Producer 12", quantity_id = 10 },
+					new Producer { id = 13, name = "Datasink CPU Load", quantity_id = 10 },
+					new Producer { id = 14, name = "Datasink MemTotal", quantity_id = 11 },
+					new Producer { id = 15, name = "Datasink MemAvailable", quantity_id = 12 },
+					new Producer { id = 16, name = "Datasink MemFree", quantity_id = 13 },
 				};
 				context.producers.AddRange(records);
 			}

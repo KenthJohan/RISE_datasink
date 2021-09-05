@@ -40,7 +40,7 @@
 var query = `query{
 t1:projects{id name}
 t2:quantities{id name}
-t3:producers{id name}
+t3:producers{id name enable_mqtt enable_reqget}
 t4:locations{id name}
 t5:users{id email}
 t6:memlocs{id}
@@ -52,7 +52,7 @@ t8:devices{id name}
 configs = {};
 configs.t1 = {title:'Projects', columns: ['id', 'name']};
 configs.t2 = {title:'Quantities', columns: ['id', 'name']};
-configs.t3 = {title:'Producers', columns: ['id', 'name']};
+configs.t3 = {title:'Producers', columns: ['id', 'name', 'enable_mqtt', 'enable_reqget']};
 configs.t4 = {title:'Locations', columns: ['id', 'name']};
 configs.t5 = {title:'Users', columns: ['id', 'email']};
 configs.t6 = {title:'Memlocs', columns: ['id']};

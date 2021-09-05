@@ -13,6 +13,9 @@ namespace Demo
 		public virtual ICollection<Floatval> floatvals { get; set; }
 		public virtual ICollection<Memloc> memlocs { get; set; }
 
+		public bool enable_mqtt { get; set; } = false;
+		public bool enable_reqget { get; set; } = false;
+		public bool enable_websock { get; set; } = false;
 
 		public int device_id { get; set; } = 1;
 		public int project_id { get; set; } = 1;
