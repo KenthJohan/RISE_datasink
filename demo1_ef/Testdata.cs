@@ -90,6 +90,7 @@ namespace Demo
 					new Producer { id = 10, name = "Producer 10", quantity_id = 9 },
 					new Producer { id = 11, name = "Producer 11", quantity_id = 4 },
 					new Producer { id = 12, name = "Producer 12", quantity_id = 4 },
+					new Producer { id = 13, name = "Producer 12", quantity_id = 10 },
 				};
 				context.producers.AddRange(records);
 			}
