@@ -33,6 +33,8 @@ function build_column_th(tr, column)
 	var toname = {};
 	toname['enable_mqtt'] = 'MQTT';
 	toname['enable_reqget'] = 'GET';
+	toname['enable_websock'] = 'WS';
+	toname['enable_storage'] = 'DB';
 	var th = document.createElement("th");
 	th.textContent = toname[column] ? toname[column] : column;
 	switch(column)
@@ -43,6 +45,8 @@ function build_column_th(tr, column)
 		break;
 	case 'enable_mqtt':
 	case 'enable_reqget':
+	case 'enable_websock':
+	case 'enable_storage':
 		th.style.writingMode = "vertical-lr";
 		break;
 	}
@@ -62,6 +66,8 @@ function build_column(table, tr, column, rows, r)
 		break;
 	case 'enable_mqtt':
 	case 'enable_reqget':
+	case 'enable_websock':
+	case 'enable_storage':
 		var checkbox = document.createElement("input");
 		checkbox.setAttribute("type", "checkbox");
 		checkbox.checked = rows[r][column];
