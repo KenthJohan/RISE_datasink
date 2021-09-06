@@ -16,7 +16,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Project_Query
 	{
-		private readonly ILogger log = Log.ForContext<Project_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Project_Query>();
 
 
 		public IQueryable<Project> projects([Service] Demo_Context context)

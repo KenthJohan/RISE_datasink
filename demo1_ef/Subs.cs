@@ -24,7 +24,7 @@ namespace Demo
 
 	public static class Subs
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(Subs));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Subs));
 
 		// Used for O(1) complexity
 		// [websocket][producer_id]

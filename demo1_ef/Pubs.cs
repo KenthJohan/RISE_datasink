@@ -47,7 +47,7 @@ namespace Demo
 
 	static class Pubs
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(Pubs));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Pubs));
 		public static Dictionary<int, List<Memloc>> dict_memlocs = new Dictionary<int, List<Memloc>>();
 
 		private static HashSet<WebSocket> subs = new HashSet<WebSocket>();

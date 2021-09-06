@@ -16,7 +16,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Memloc_Query
 	{
-		private readonly ILogger log = Log.ForContext<Memloc_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Memloc_Query>();
 
 
 		[UseProjection]

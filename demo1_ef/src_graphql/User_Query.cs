@@ -36,7 +36,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class User_Query
 	{
-		private readonly ILogger log = Log.ForContext<User_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<User_Query>();
 
 		public IQueryable<User> users([Service] Demo_Context context)
 		{

@@ -16,7 +16,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Location_Query
 	{
-		private readonly ILogger log = Log.ForContext<Location_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Location_Query>();
 
 
 		public IQueryable<Location> locations([Service] Demo_Context context)

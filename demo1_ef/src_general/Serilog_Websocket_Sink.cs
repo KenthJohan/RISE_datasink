@@ -25,7 +25,7 @@ namespace Demo
 		static readonly JsonValueFormatter f = new JsonValueFormatter("$type");
 		
 		
-		private static readonly ILogger log = Log.ForContext(typeof(Serilog_Websocket_Sink));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Serilog_Websocket_Sink));
 
 		public static async Task accept_ws(HttpContext context)
 		{

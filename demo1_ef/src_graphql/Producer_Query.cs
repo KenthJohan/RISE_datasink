@@ -26,7 +26,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Producer_Query
 	{
-		private readonly ILogger log = Log.ForContext<Producer_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Producer_Query>();
 
 
 		[UseProjection]

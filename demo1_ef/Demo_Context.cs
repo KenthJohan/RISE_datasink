@@ -29,7 +29,7 @@ namespace Demo
 	public class Demo_Context : DbContext
 	{
 
-		private readonly ILoggerFactory _loggerFactory;
+		private readonly Serilog.ILoggerFactory _loggerFactory;
 		private readonly Serilog.ILogger log = Log.ForContext<Demo_Context>();
 
 		public DbSet<User> users { get; set; }

@@ -10,7 +10,7 @@ namespace Demo
 
 	public static class GraphQL_Services
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(GraphQL_Services));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(GraphQL_Services));
 		
 		public static void init(IServiceCollection services)
 		{

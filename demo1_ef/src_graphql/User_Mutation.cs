@@ -18,7 +18,7 @@ namespace Demo
 	[ExtendObjectType("Mutation")]
 	public class User_Mutation
 	{
-		private readonly ILogger log = Log.ForContext<User_Mutation>();
+		private readonly Serilog.ILogger log = Log.ForContext<User_Mutation>();
 		public IQueryable<User> user_register([Service] Demo_Context context, string email, string password, string allowpw)
 		{
 			if (string.IsNullOrEmpty(email)){throw new QueryException(ErrorBuilder.New().SetMessage("The (email) cannot be empty.").SetCode("EMAIL_EMPTY").Build());}

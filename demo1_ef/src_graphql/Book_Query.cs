@@ -24,7 +24,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Book_Query
 	{
-		private readonly ILogger log = Log.ForContext<User_Mutation>();
+		private readonly Serilog.ILogger log = Log.ForContext<User_Mutation>();
 		public IQueryable<Book> books([Service] Demo_Context context) 
 		{
 			return context.books;

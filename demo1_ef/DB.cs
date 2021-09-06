@@ -24,7 +24,7 @@ namespace Demo
 		public static NpgsqlConnection connection;
 		public static NpgsqlCommand command_insert_floatval;
 
-		private static readonly ILogger log = Log.ForContext(typeof(DB));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(DB));
 
 		public static void dropall(DbContext context)
 		{

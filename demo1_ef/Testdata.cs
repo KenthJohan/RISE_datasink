@@ -19,7 +19,7 @@ namespace Demo
 
 	public static class Testdata
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(Testdata));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Testdata));
 		public static void add(this Demo_Context context)
 		{
 			{

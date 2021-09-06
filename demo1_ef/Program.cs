@@ -12,7 +12,7 @@ namespace Demo
 {
 	public class Program
 	{
-		private static readonly ILogger log = Log.ForContext(typeof(Program));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Program));
 
 		public static void Main(string[] args)
 		{

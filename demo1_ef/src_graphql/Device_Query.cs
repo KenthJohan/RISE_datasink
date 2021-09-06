@@ -16,7 +16,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Device_Query
 	{
-		private readonly ILogger log = Log.ForContext<Device_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Device_Query>();
 
 
 		public IQueryable<Device> devices([Service] Demo_Context context)

@@ -30,7 +30,7 @@ namespace Demo
 	[ExtendObjectType("Query")]
 	public class Floatval_Query
 	{
-		private readonly ILogger log = Log.ForContext<Floatval_Query>();
+		private readonly Serilog.ILogger log = Log.ForContext<Floatval_Query>();
 
 		[HotChocolate.Data.UseProjection]
 		[HotChocolate.Data.UseFiltering]

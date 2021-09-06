@@ -27,7 +27,7 @@ namespace Demo
 {
 	public class Demo_Controller : Controller
 	{
-		private readonly ILogger log = Log.ForContext<Demo_Controller>();
+		private readonly Serilog.ILogger log = Log.ForContext<Demo_Controller>();
 		private readonly Demo_Context _context;
 		public Demo_Controller(Demo_Context context)
 		{
