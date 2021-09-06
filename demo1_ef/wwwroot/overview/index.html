@@ -42,11 +42,11 @@
 configs = {};
 configs.t1 = {title:'Projects', table:'projects', columns: ['id', 'name']};
 configs.t2 = {title:'Quantities', table:'quantities', columns: ['id', 'name']};
-configs.t3 = {title:'Producers', table:'producers', columns: ['id', 'name', 'enable_mqtt', 'enable_reqget', 'enable_websock', 'enable_storage']};
+configs.t3 = {title:'Producers', table:'producers', columns: ['id', 'name', 'enable_mqtt', 'enable_reqget', 'enable_reqjson', 'enable_websock', 'enable_tcp', 'enable_udp', 'enable_storage']};
 configs.t4 = {title:'Locations', table:'locations', columns: ['id', 'name']};
 configs.t5 = {title:'Users', table:'users', columns: ['id', 'email']};
-configs.t6 = {title:'Memlocs', table:'memlocs', columns: ['id']};
-configs.t7 = {title:'Layouts', table:'layouts', columns: ['id', 'name']};
+configs.t6 = {title:'Memlocs', table:'memlocs', columns: ['id', 'layout_id', 'producer_id']};
+configs.t7 = {title:'Layouts', table:'layouts', columns: ['id', 'name', 'enable_mqtt', 'enable_websock', 'enable_tcp', 'enable_udp', 'enable_storage']};
 configs.t8 = {title:'Devices', table:'devices', columns: ['id', 'name']};
 
 

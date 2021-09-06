@@ -92,7 +92,7 @@ namespace Demo
 
 			config_hypertables(context);
 			Testdata.add(context);
-			Pubs.load(context);
+			Layout_Publist.load(context);
 
 			connection = new NpgsqlConnection(DB.npgsql_connection);
 			connection.Open();

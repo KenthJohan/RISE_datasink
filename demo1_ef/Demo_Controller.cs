@@ -111,7 +111,7 @@ namespace Demo
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Subs.accept(await c.WebSockets.AcceptWebSocketAsync());
+				await Producer_Sublist.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{
@@ -127,7 +127,7 @@ namespace Demo
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Pubs.accept(await c.WebSockets.AcceptWebSocketAsync());
+				await Layout_Publist.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{

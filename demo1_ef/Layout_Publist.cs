@@ -1,53 +1,19 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
-using Microsoft.AspNetCore.Http;
-
-using Serilog;
-using Serilog.Formatting.Compact;
-using Serilog.Formatting.Json;
-using Serilog.Configuration;
-using Serilog.Core;
-using Serilog.Events;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
-
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using NpgsqlTypes;
-
-using System.Net.WebSockets;
-using Serilog;
 using System.Buffers.Binary;
-using System.Diagnostics;
+using Serilog;
 
 
 namespace Demo
 {
 
-	static class Pubs
+	static class Layout_Publist
 	{
-		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Pubs));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Layout_Publist));
 		public static Dictionary<int, List<Memloc>> dict_memlocs = new Dictionary<int, List<Memloc>>();
 
 		private static HashSet<WebSocket> subs = new HashSet<WebSocket>();
@@ -90,7 +56,7 @@ namespace Demo
 				importer.Write(value);
 				//importer.Write(0.0f);
 				//importer.Write(0.0f);
-				Subs.publish(memloc.producer_id, DateTime.Now, value);
+				Producer_Sublist.publish(memloc.producer_id, DateTime.Now, value);
 			}
 			ulong r = importer.Complete();
 			log.Information("importer.Complete(): {r}", r);

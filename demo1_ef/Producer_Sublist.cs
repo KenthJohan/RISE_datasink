@@ -22,9 +22,9 @@ using System.Diagnostics;
 namespace Demo
 {
 
-	public static class Subs
+	public static class Producer_Sublist
 	{
-		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Subs));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Producer_Sublist));
 
 		// Used for O(1) complexity
 		// [websocket][producer_id]
