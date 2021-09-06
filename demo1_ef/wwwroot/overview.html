@@ -37,27 +37,17 @@
 <script src='add.js'></script>
 <script>
 
-var query = `query{
-t1:projects{id name}
-t2:quantities{id name}
-t3:producers{id name enable_mqtt enable_reqget}
-t4:locations{id name}
-t5:users{id email}
-t6:memlocs{id}
-t7:layouts{id name}
-t8:devices{id name}
-}`;
 
 
 configs = {};
-configs.t1 = {title:'Projects', columns: ['id', 'name']};
-configs.t2 = {title:'Quantities', columns: ['id', 'name']};
-configs.t3 = {title:'Producers', columns: ['id', 'name', 'enable_mqtt', 'enable_reqget']};
-configs.t4 = {title:'Locations', columns: ['id', 'name']};
-configs.t5 = {title:'Users', columns: ['id', 'email']};
-configs.t6 = {title:'Memlocs', columns: ['id']};
-configs.t7 = {title:'Layouts', columns: ['id', 'name']};
-configs.t8 = {title:'Devices', columns: ['id', 'name']};
+configs.t1 = {title:'Projects', table:'projects', columns: ['id', 'name']};
+configs.t2 = {title:'Quantities', table:'quantities', columns: ['id', 'name']};
+configs.t3 = {title:'Producers', table:'producers', columns: ['id', 'name', 'enable_mqtt', 'enable_reqget']};
+configs.t4 = {title:'Locations', table:'locations', columns: ['id', 'name']};
+configs.t5 = {title:'Users', table:'users', columns: ['id', 'email']};
+configs.t6 = {title:'Memlocs', table:'memlocs', columns: ['id']};
+configs.t7 = {title:'Layouts', table:'layouts', columns: ['id', 'name']};
+configs.t8 = {title:'Devices', table:'devices', columns: ['id', 'name']};
 
 
 var xhr = new XMLHttpRequest();
@@ -73,7 +63,7 @@ xhr.onerror = function ()
 {
 	console.log("XHR unknown error. Probobly Cross-Origin Request Blocked");
 }
-var data = JSON.stringify({ "query": query });
+var data = JSON.stringify({ "query": build_query(configs) });
 xhr.send(data);
 
 

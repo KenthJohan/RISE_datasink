@@ -33,7 +33,7 @@ namespace Demo
 		public IQueryable<Producer> producers([Service] Demo_Context context)
 		{
 			log.Information("Fetching producers");
-			return context.producers;
+			return context.producers.OrderBy(x => x.id);
 		}
 
 	}

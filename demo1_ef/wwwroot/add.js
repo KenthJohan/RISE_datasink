@@ -188,7 +188,24 @@ function submit_callback(event)
 
 
 
-
+function gql_checkbox_update(table, id, column, value)
+{
+	let query = `mutation{${table}_update(id:${id},${column}:${value})}`;
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", window.location.origin + "/graphql", true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onload = function ()
+	{
+		var response = JSON.parse(xhr.response);
+		if (response.data === null) { return; }
+	};
+	xhr.onerror = function ()
+	{
+		console.log("XHR unknown error. Probobly Cross-Origin Request Blocked");
+	}
+	var data = JSON.stringify({ "query": query });
+	xhr.send(data);
+}
 
 
 
@@ -203,75 +220,45 @@ function submit_callback(event)
 
 function build_column_th(tr, column)
 {
-	var th;
+	var toname = {};
+	toname['enable_mqtt'] = 'MQTT';
+	toname['enable_reqget'] = 'GET';
+	var th = document.createElement("th");
+	th.textContent = toname[column] ? toname[column] : column;
 	switch(column)
 	{
 	case 'id':
-		th = document.createElement("th");
-		th.textContent = "id";
-		tr.appendChild(th);
-		break;
 	case 'name':
-		th = document.createElement("th");
-		th.textContent = "name";
-		tr.appendChild(th);
-		break;
 	case 'email':
-		th = document.createElement("th");
-		th.textContent = "email";
-		tr.appendChild(th);
 		break;
 	case 'enable_mqtt':
-		th = document.createElement("th");
-		th.textContent = "MQTT";
-		th.style.writingMode = "vertical-lr";
-		tr.appendChild(th);
-		break;
 	case 'enable_reqget':
-		th = document.createElement("th");
-		th.textContent = "GET";
 		th.style.writingMode = "vertical-lr";
-		tr.appendChild(th);
 		break;
 	}
+	tr.appendChild(th);
 }
 
-function build_column(tr, column, rows, r)
+function build_column(table, tr, column, rows, r)
 {
-	var td;
+	var td = tr.insertCell(-1);
 	switch(column)
 	{
 	case 'id':
-		td = tr.insertCell(-1);
-		td.textContent = rows[r].id;
-		td.style.width = "30px";
-		break;
 	case 'name':
-		td = tr.insertCell(-1);
-		td.textContent = rows[r].name;
-		td.style.width = "30px";
-		break;
 	case 'email':
-		td = tr.insertCell(-1);
-		td.textContent = rows[r].email;
-		td.style.width = "30px";
+		//td.style.width = "30px";
+		td.textContent = rows[r][column];
 		break;
 	case 'enable_mqtt':
-		var checkbox = document.createElement("input");
-		checkbox.setAttribute("type", "checkbox");
-		checkbox.checked = rows[r].enable_mqtt;
-		td = tr.insertCell(-1);
-		td.appendChild(checkbox);
-		break;
 	case 'enable_reqget':
 		var checkbox = document.createElement("input");
 		checkbox.setAttribute("type", "checkbox");
-		checkbox.checked = rows[r].enable_reqget;
+		checkbox.checked = rows[r][column];
 		checkbox.onchange = (x) => 
 		{
-			console.log(x);
+			gql_checkbox_update(table, rows[r].id, column, x.target.checked);
 		}
-		td = tr.insertCell(-1);
 		td.appendChild(checkbox);
 		break;
 	}
@@ -310,15 +297,46 @@ function build_table(config, rows)
 	}
 
 	{
-		var tbody = document.createElement('thead');
+		var tbody = document.createElement('tbody');
 		for(var r = 0; r < rows.length; ++r)
 		{
 			var tr = tbody.insertRow(-1);
 			for(var c = 0; c < config.columns.length; ++c)
 			{
-				build_column(tr, config.columns[c], rows, r);
+				build_column(config.table, tr, config.columns[c], rows, r);
 			}
 		}
 		config.dst.appendChild(tbody);
 	}
+}
+
+
+/*
+var query = `query{
+t1:projects{id name}
+t2:quantities{id name}
+t3:producers{id name enable_mqtt enable_reqget}
+t4:locations{id name}
+t5:users{id email}
+t6:memlocs{id}
+t7:layouts{id name}
+t8:devices{id name}
+}`;
+*/
+
+function build_query(configs)
+{
+	let query = 'query{\n';
+	for (const k in configs)
+	{
+		query += `${k}:${configs[k].table}{`;
+		for (const r in configs[k].columns)
+		{
+			query += configs[k].columns[r] + ' ';
+		}
+		query += '}\n';
+	}
+	query += '}';
+	//console.log(query);
+	return query;
 }

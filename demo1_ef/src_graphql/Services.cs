@@ -35,6 +35,7 @@ namespace Demo
 				.AddMutationType(d => d.Name("Mutation"))
 					.AddTypeExtension<User_Mutation>()
 					.AddTypeExtension<Floatval_Mutation>()
+					.AddTypeExtension<Producer_Mutation>()
 				.AddProjections()
 				.AddFiltering()
 				.AddSorting();
