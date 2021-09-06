@@ -107,7 +107,7 @@ function show_inputs(memlocs)
 				subs.push(x.target.innerText);
 				x.target.classList.add("active");
 			}
-			document.getElementById('iframe').src = "/subscribe.html#a,"+subs.join(",");
+			document.getElementById('iframe').src = "/subscribe/#a,"+subs.join(",");
 			console.log(subs, j, x.target.innerText, document.getElementById('iframe').src);
 		}
 		cell = row.insertCell(-1);

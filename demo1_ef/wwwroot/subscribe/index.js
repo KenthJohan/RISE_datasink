@@ -1,39 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>Subscribe</title>
-<link rel="stylesheet" type="text/css" href="arena.css"/>
-<script src="https://cdn.plot.ly/plotly-2.3.1.min.js"></script>
-<style>
-body
-{
-	background-color: whitesmoke;
-}
-#plot
-{
-	height: 100%;
-}
-</style>
-</head>
-<body>
-
-<form id="form">
-	<p>
-		<label for="producer_id">Producer</label><br>
-		<select name="producer_id" graphql_option="producers{value:id name:name name1:quantity_name quantity_id}"></select>
-	</p>
-	<p><input type="submit" value="Toggle subscription"></p>
-</form>
-
-
-<div id="plot"></div>
-
-
-<script src='basic.js'></script>
-<script src='add.js'></script>
-<script>
-	//https://plotly.com/javascript/streaming/
+//https://plotly.com/javascript/streaming/
 
 //var t = new Date();
 
@@ -218,11 +183,5 @@ function hashchange1()
 }
 
 window.addEventListener('hashchange', hashchange1, false);
-
-
-
-</script>
-</body>
-</html>
 
 
