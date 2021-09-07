@@ -38,6 +38,7 @@ function build_column_th(tr, column)
 	toname['enable_tcp'] = 'TCP';
 	toname['enable_udp'] = 'UDP';
 	toname['enable_storage'] = 'DB';
+	toname['devtool_publisher'] = 'Devtool publisher';
 	var th = document.createElement("th");
 	th.textContent = toname[column] ? toname[column] : column;
 	switch(column)
@@ -88,6 +89,13 @@ function build_column(table, tr, column, rows, r)
 			gql_checkbox_update(table, rows[r].id, column, x.target.checked);
 		}
 		td.appendChild(checkbox);
+		break;
+	
+	case 'devtool_publisher':
+		var a = document.createElement('a');
+		a.innerText = rows[r].name;
+		a.href = '/publish/#' + rows[r].id;
+		td.appendChild(a);
 		break;
 	}
 }
@@ -160,7 +168,14 @@ function build_query(configs)
 		query += `${k}:${configs[k].table}{`;
 		for (const r in configs[k].columns)
 		{
-			query += configs[k].columns[r] + ' ';
+			let colname = configs[k].columns[r];
+			switch(colname)
+			{
+			case 'devtool_publisher':
+				break;
+			default:
+				query += colname + ' ';
+			}
 		}
 		query += '}\n';
 	}

@@ -92,7 +92,7 @@ namespace Demo
 
 			config_hypertables(context);
 			Testdata.add(context);
-			Publist_Layout.load(context);
+			Hub.load(context);
 
 			connection = new NpgsqlConnection(DB.npgsql_connection);
 			connection.Open();
@@ -132,6 +132,27 @@ namespace Demo
 			r = context.Database.ExecuteSqlRaw($"SELECT add_dimension('floatvals', 'producer_id', number_partitions => 4);");
 			Log.Information("add_dimension {r}", r);
 		}
+
+
+
+
+
+
+		public static void insert_value(int producer_id, float value)
+		{
+			using var importer = DB.connection.BeginBinaryImport("COPY floatvals (producer_id, value) FROM STDIN (FORMAT binary)");
+			importer.StartRow();
+			importer.Write(producer_id);
+			importer.Write(value);
+			ulong r = importer.Complete();
+			log.Information("importer.Complete(): {r}", r);
+		}
+
+
+
+
+
+
 
 	}
 }

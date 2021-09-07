@@ -14,24 +14,13 @@ namespace Demo
 	static class Publist_Layout
 	{
 		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Publist_Layout));
-		public static Dictionary<int, List<Memloc>> dict_memlocs = new Dictionary<int, List<Memloc>>();
+		
 
 		private static HashSet<WebSocket> subs = new HashSet<WebSocket>();
 
 
-		public static void load(Demo_Context context, int layout_id)
-		{
-			List<Memloc> memlocs = context.memlocs.Where(x => x.layout_id == layout_id).ToList();
-			dict_memlocs.Add(layout_id, memlocs);
-		}
-		public static void load(Demo_Context context)
-		{
-			List<Layout> layouts = context.layouts.ToList();
-			foreach (Layout layout in layouts)
-			{
-				load(context, layout.id);
-			}
-		}
+
+
 
 
 		// |byte0|byte1|byte2|byte3|byte4|byte5|byte6|byte7|etc    |
@@ -45,7 +34,7 @@ namespace Demo
 			//"INSERT INTO floatvals (producer_id,time,value) VALUES (@producer_id, @time, @value)"
 			using var importer = DB.connection.BeginBinaryImport("COPY floatvals (producer_id, value) FROM STDIN (FORMAT binary)");
 			int layout_id = BinaryPrimitives.ReadInt32BigEndian(buffer.Slice(0));
-			foreach(Memloc memloc in dict_memlocs[layout_id])
+			foreach(Memloc memloc in Hub.dict_memlocs[layout_id])
 			{
 				//Debug.Assert(memloc.byteoffset > 3);
 				importer.StartRow();
@@ -56,7 +45,8 @@ namespace Demo
 				importer.Write(value);
 				//importer.Write(0.0f);
 				//importer.Write(0.0f);
-				Sublist_Producer.publish(memloc.producer_id, DateTime.Now, value);
+				//Sublist_Producer.publish(memloc.producer_id, DateTime.Now, value);
+				Hub.send(memloc.producer_id, value);
 			}
 			ulong r = importer.Complete();
 			log.Information("importer.Complete(): {r}", r);

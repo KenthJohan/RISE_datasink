@@ -60,6 +60,7 @@ namespace Demo
 			return Content(HTML.create_table(t), "text/html");
 		}
 
+		/*
 		[HttpGet("/test_npgsql_command")]
 		public IActionResult test_npgsql_command()
 		{
@@ -76,6 +77,7 @@ namespace Demo
 			}
 			return Content("paratest", "text/html");
 		}
+		*/
 
 
 
@@ -140,7 +142,11 @@ namespace Demo
 
 
 
-
+		[HttpGet("/pub/{producer_id}/{value}")]
+		public async Task pub(int producer_id, float value)
+		{
+			Hub.send(producer_id, value);
+		}
 
 
 
