@@ -105,13 +105,13 @@ namespace Demo
 
 
 
-		[HttpGet("/ws/sub")]
+		[HttpGet("/ws/sub/producer")]
 		public async Task ws_sub()
 		{
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Producer_Sublist.accept(await c.WebSockets.AcceptWebSocketAsync());
+				await Sublist_Producer.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{
@@ -121,13 +121,13 @@ namespace Demo
 		}
 
 
-		[HttpGet("/ws/pub")]
+		[HttpGet("/ws/pub/layout")]
 		public async Task ws_pub()
 		{
 			var c = ControllerContext.HttpContext;
 			if (c.WebSockets.IsWebSocketRequest)
 			{
-				await Layout_Publist.accept(await c.WebSockets.AcceptWebSocketAsync());
+				await Publist_Layout.accept(await c.WebSockets.AcceptWebSocketAsync());
 			}
 			else
 			{

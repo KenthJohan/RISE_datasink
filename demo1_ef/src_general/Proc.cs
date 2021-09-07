@@ -223,8 +223,29 @@ namespace Demo
 			}
 		}
 
+		public static ulong calc_idle(ulong[] x)
+		{
+			return x[(int)Statcpu.idle] + x[(int)Statcpu.iowait];
+		}
+		public static ulong calc_nidle(ulong[] x)
+		{
+			return x[(int)Statcpu.user] + x[(int)Statcpu.nice] + x[(int)Statcpu.system] + x[(int)Statcpu.softirq];
+		}
+
 		//https://www.kgoettler.com/post/proc-stat/
 		//https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+		public static double calc_load1(ulong[] prev, ulong[] cur)
+		{
+			ulong idle_prev = calc_idle(prev);
+			ulong idle_cur = calc_idle(cur);
+			ulong total_prev = idle_prev + calc_nidle(prev);
+			ulong total_cur = idle_cur + calc_nidle(cur);
+			double totald = (double) total_cur - (double) total_prev;
+			double idled = (double) idle_cur - (double) idle_prev;
+			double cpu_perc = (1000 * (totald - idled) / totald + 1) / 10;
+			return cpu_perc;
+		}
+
 		public static double calc_load(ulong[] prev, ulong[] cur)
 		{
 			ulong idle_prev = prev[(int)Statcpu.idle] + prev[(int)Statcpu.iowait];

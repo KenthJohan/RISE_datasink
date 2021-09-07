@@ -130,7 +130,7 @@ function ws_connect(url)
 
 
 
-var url = ws_url("/ws/sub");
+var url = ws_url("/ws/sub/producer");
 var socket = ws_connect(url);
 
 

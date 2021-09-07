@@ -11,9 +11,9 @@ using Serilog;
 namespace Demo
 {
 
-	static class Layout_Publist
+	static class Publist_Layout
 	{
-		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Layout_Publist));
+		private static readonly Serilog.ILogger log = Log.ForContext(typeof(Publist_Layout));
 		public static Dictionary<int, List<Memloc>> dict_memlocs = new Dictionary<int, List<Memloc>>();
 
 		private static HashSet<WebSocket> subs = new HashSet<WebSocket>();
@@ -56,7 +56,7 @@ namespace Demo
 				importer.Write(value);
 				//importer.Write(0.0f);
 				//importer.Write(0.0f);
-				Producer_Sublist.publish(memloc.producer_id, DateTime.Now, value);
+				Sublist_Producer.publish(memloc.producer_id, DateTime.Now, value);
 			}
 			ulong r = importer.Complete();
 			log.Information("importer.Complete(): {r}", r);
