@@ -1,18 +1,6 @@
 
 
 
-
-
-/*
-
-	public int id { get; set; }
-	public int layout_id { get; set; }
-	public int producer_id { get; set; }
-	public int byteoffset { get; set; }
-	public virtual Layout layout { get; set; }
-*/
-
-
 function show_byte_array(memlocs, length, etable, element_hexs2)
 {
 	assert(memlocs instanceof Array);
@@ -75,51 +63,46 @@ function show_byte_array(memlocs, length, etable, element_hexs2)
 }
 
 
-function show_inputs(layout_id, memlocs, subs, sendbuffer, element_tbody, e_table_bytes, element_inputs, element_hexs1, element_hexs2)
+function show_inputs(layout_id, memlocs, sendbuffer, element_tbody, e_table_bytes, element_inputs, element_hexs1, element_hexs2, ke_sub_btn)
 {
 	assert(typeof layout_id == 'number');
 	assert(memlocs instanceof Array);
-	assert(subs instanceof Array);
 	assert(sendbuffer instanceof ArrayBuffer);
 	assert(element_tbody instanceof HTMLElement);
 	assert(e_table_bytes instanceof HTMLElement);
 	assert(element_inputs instanceof Array);//array of HTMLElement
 	assert(element_hexs1 instanceof Array);//array of HTMLElement
 	assert(element_hexs2 instanceof Array);//array of HTMLElement
+	assert(ke_sub_btn instanceof Object);//array of HTMLElement
 	//assert(etable instanceof HTMLElement);
 	for (let i = 0; i < memlocs.length; ++i)
 	{
-		let row = element_tbody.insertRow(-1);
-		let cell;
-		cell = row.insertCell(-1);
-		cell.innerText = memlocs[i].id;
-		cell.style.backgroundColor = random_hsla(""+i);
-		cell = row.insertCell(-1);
-		cell.innerText = memlocs[i].producer_id;
-		cell.classList.add("cell");
-		cell.onclick = (x) => 
+		let tr = element_tbody.insertRow(-1);
+		let td;
+		let producer_id = memlocs[i].producer_id;
+
+		td = tr.insertCell(-1);
+		td.innerText = memlocs[i].id;
+		td.style.backgroundColor = random_hsla(""+i);
+
+		td = tr.insertCell(-1);
+		ke_sub_btn[producer_id] = td;
+		td.innerText = producer_id;
+		td.classList.add('btn');
+		if (producer_id != 1) {td.setAttribute('sub', "");}
+		td.onclick = (x) => 
 		{
-			var j = subs.indexOf(x.target.innerText);
-			if (j >= 0)
-			{
-				subs.splice(j, 1);
-				x.target.classList.remove("active");
-			}
-			else
-			{
-				subs.push(x.target.innerText);
-				x.target.classList.add("active");
-			}
-			document.getElementById('iframe').src = "/subscribe/#a,"+subs.join(",");
-			console.log(subs, j, x.target.innerText, document.getElementById('iframe').src);
+			x.target.toggleAttribute('sub');
+			update_iframe(ke_sub_btn);
 		}
-		cell = row.insertCell(-1);
-		cell.innerText = memlocs[i].producer.quantity.name
+
+		td = tr.insertCell(-1);
+		td.innerText = memlocs[i].producer.quantity.name
 		//cell = row.insertCell(0);
 		//cell.innerText = memlocs[i].layout_id;
-		cell = row.insertCell(-1);
-		cell.innerText = memlocs[i].byteoffset;
-		cell = row.insertCell(-1);
+		td = tr.insertCell(-1);
+		td.innerText = memlocs[i].byteoffset;
+		td = tr.insertCell(-1);
 		{
 			let e = document.createElement("input");
 			e.setAttribute("type", "text");
@@ -130,15 +113,16 @@ function show_inputs(layout_id, memlocs, subs, sendbuffer, element_tbody, e_tabl
 				showhex2(sendbuffer, e_table_bytes._row_hex);
 				showhex(memlocs, element_inputs, element_hexs1, element_hexs2);
 			}
-			cell.appendChild(e);
+			td.appendChild(e);
 			element_inputs.push(e);
 		}
-		cell = row.insertCell(-1);
+		td = tr.insertCell(-1);
 		{
-			cell.innerText = 0;
-			element_hexs1.push(cell);
+			td.innerText = 0;
+			element_hexs1.push(td);
 		}
 	}
+	console.log(ke_sub_btn);
 }
 
 
@@ -180,7 +164,7 @@ function showhex2(buf, tr)
 {
 	assert(buf instanceof ArrayBuffer);
 	assert(tr instanceof HTMLElement);
-	var u = new Uint8Array(buf)
+	let u = new Uint8Array(buf)
 	for (let i = 0; i < tr.cells.length; ++i)
 	{
 		tr.cells[i].innerText = u[i].toString(16).toUpperCase();
@@ -238,7 +222,16 @@ function ws_connect(url)
 
 
 
-
+function update_iframe(ke_btnsub)
+{
+	assert(ke_btnsub instanceof Object);
+	let q = '';
+	for (let k in ke_btnsub)
+	{
+		q += ke_btnsub[k].hasAttribute('sub') ? k+',' : '';
+	}
+	document.getElementById('iframe').src = '/subscribe/#a,' + q;
+}
 
 
 
@@ -249,12 +242,12 @@ class load
 		this.element_hexs1 = [];
 		this.element_hexs2 = [];
 		this.element_inputs = [];
+		this.ke_btnsub = {};//Key-Value pair where each key represent a specific producer and value represent HTMLElement td button
 		this.sendbuffer = null;
-		let subs = [];
-		let element_tbody = document.getElementById("tbody");
-		let e_table_bytes = document.getElementById("bytes");
-		let element_button_pub = document.getElementById("pub");
-		let element_button_pubr = document.getElementById("pubr");
+		this.e_tbody = document.getElementById("tbody");
+		this.e_table_bytes = document.getElementById("bytes");
+		this.e_button_pub = document.getElementById("pub");
+		this.e_button_pubr = document.getElementById("pubr");
 		let url = ws_url("/ws/pub/layout");
 		let socket = ws_connect(url);
 		//let layout_id = 4;
@@ -271,10 +264,11 @@ class load
 			console.log(memlocs);
 			let bytesize = memlocs[memlocs.length - 1].byteoffset + 4;
 			this.sendbuffer = new ArrayBuffer(bytesize);
-			show_inputs(layout_id, memlocs, subs, this.sendbuffer, element_tbody, e_table_bytes, this.element_inputs, this.element_hexs1, this.element_hexs2);
-			show_byte_array(memlocs, this.sendbuffer.byteLength, e_table_bytes, this.element_hexs2);
-			element_button_pub.onclick = (x) => { pub(socket, layout_id, memlocs, this.element_inputs); };
-			element_button_pubr.onclick = (x) => 
+			show_inputs(layout_id, memlocs, this.sendbuffer, this.e_tbody, this.e_table_bytes, this.element_inputs, this.element_hexs1, this.element_hexs2, this.ke_btnsub);
+			show_byte_array(memlocs, this.sendbuffer.byteLength, this.e_table_bytes, this.element_hexs2);
+			update_iframe(this.ke_btnsub);
+			this.e_button_pub.onclick = (x) => { pub(socket, layout_id, memlocs, this.element_inputs); };
+			this.e_button_pubr.onclick = (x) => 
 			{
 				for(let i = 0; i < this.element_inputs.length; ++i)
 				{
@@ -300,7 +294,6 @@ class load
 function hashchange1()
 {
 	var f = location.hash.substring(1);
-	console.log(f);
 	new load(Number(f));
 }
 
