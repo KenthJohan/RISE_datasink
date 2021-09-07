@@ -221,7 +221,6 @@ function ws_connect(url)
 };
 
 
-
 function update_iframe(ke_btnsub)
 {
 	assert(ke_btnsub instanceof Object);
@@ -234,40 +233,40 @@ function update_iframe(ke_btnsub)
 }
 
 
-
-class load
+class App
 {
 	constructor(layout_id)
 	{
 		this.element_hexs1 = [];
 		this.element_hexs2 = [];
 		this.element_inputs = [];
-		this.ke_btnsub = {};//Key-Value pair where each key represent a specific producer and value represent HTMLElement td button
-		this.sendbuffer = null;
+		this.ke_btnsub = {};//Key-Value pair where each key represent a specific producer and the value represent HTMLElement td button
+		this.sendbuffer = null; //ArrayBuffer
 		this.e_tbody = document.getElementById("tbody");
 		this.e_table_bytes = document.getElementById("bytes");
 		this.e_button_pub = document.getElementById("pub");
 		this.e_button_pubr = document.getElementById("pubr");
 		let url = ws_url("/ws/pub/layout");
 		let socket = ws_connect(url);
-		//let layout_id = 4;
 		let query = "query{memlocs(layout_id:" + layout_id + "){id layout_id producer_id byteoffset producer{quantity{name}}}}";
 		let xhr = new XMLHttpRequest();
 		xhr.open("POST", window.location.origin + "/graphql", true);
 		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.onload = () =>
 		{
-			console.log(this);
 			let r = JSON.parse(xhr.response);
 			if (r.data === null) { return; }
 			let memlocs = r.data.memlocs;
-			console.log(memlocs);
+			//Assume the last memloc refer to the last float value.
 			let bytesize = memlocs[memlocs.length - 1].byteoffset + 4;
 			this.sendbuffer = new ArrayBuffer(bytesize);
 			show_inputs(layout_id, memlocs, this.sendbuffer, this.e_tbody, this.e_table_bytes, this.element_inputs, this.element_hexs1, this.element_hexs2, this.ke_btnsub);
 			show_byte_array(memlocs, this.sendbuffer.byteLength, this.e_table_bytes, this.element_hexs2);
 			update_iframe(this.ke_btnsub);
-			this.e_button_pub.onclick = (x) => { pub(socket, layout_id, memlocs, this.element_inputs); };
+			this.e_button_pub.onclick = (x) => 
+			{
+				pub(socket, layout_id, memlocs, this.element_inputs);
+			};
 			this.e_button_pubr.onclick = (x) => 
 			{
 				for(let i = 0; i < this.element_inputs.length; ++i)
@@ -294,7 +293,7 @@ class load
 function hashchange1()
 {
 	var f = location.hash.substring(1);
-	new load(Number(f));
+	new App(Number(f));
 }
 
 window.addEventListener('hashchange', hashchange1, false);
