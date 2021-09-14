@@ -63,9 +63,15 @@ function build_column_th(tr, column)
 
 function build_column(table, tr, column, rows, r)
 {
-	var td = tr.insertCell(-1);
+	let td = tr.insertCell(-1);
 	switch(column)
 	{
+	case 'sub':{
+		let a = document.createElement("a");
+		a.innerText = 'sub';
+		a.href = `/subscribe/#${table}/${rows[r].id}`;
+		td.appendChild(a);
+		}break;
 	case 'id':
 	case 'name':
 	case 'email':
@@ -81,7 +87,7 @@ function build_column(table, tr, column, rows, r)
 	case 'enable_tcp':
 	case 'enable_udp':
 	case 'enable_storage':
-		var checkbox = document.createElement("input");
+		let checkbox = document.createElement("input");
 		checkbox.setAttribute("type", "checkbox");
 		checkbox.checked = rows[r][column];
 		checkbox.onchange = (x) => 
@@ -91,12 +97,12 @@ function build_column(table, tr, column, rows, r)
 		td.appendChild(checkbox);
 		break;
 	
-	case 'devtool_publisher':
-		var a = document.createElement('a');
+	case 'devtool_publisher':{
+		let a = document.createElement('a');
 		a.innerText = rows[r].name;
 		a.href = '/publish/#' + rows[r].id;
 		td.appendChild(a);
-		break;
+		}break;
 	}
 }
 
@@ -171,6 +177,7 @@ function build_query(configs)
 			let colname = configs[k].columns[r];
 			switch(colname)
 			{
+			case 'sub':
 			case 'devtool_publisher':
 				break;
 			default:

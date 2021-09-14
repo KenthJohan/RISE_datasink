@@ -1,35 +1,160 @@
-var element_url = document.getElementById("myurl");
-element_url.value = ws_url("/wslog");
-var element_status = document.getElementById("mystatus");
-
-
-var myapp = {};
-myapp.n = 0;
-myapp.table = document.getElementById("mytable");
-myapp.tbody = myapp.table.createTBody();
-myapp.thead = myapp.table.createTHead();
-
-
-function table_init(app)
+function indexOf(str, needles, fromIndex)
 {
-	app.data = [];
-	app.data[0] = [];
-	app.data[1] = [];
-	app.data[2] = [];
-	app.data[3] = [];
-	app.data[4] = [];
-	app.data[5] = [];
-	app.data[6] = [];
-	app.data[7] = [];
-
-	app.filter = [];
-	app.input = [];
-
-	app.colname = ["Time", "ClientIp", "RequestId", "Method", "SourceContext", "Message"];
-	app.tbody.innerHTML = "";
-	app.thead.innerHTML = "";
-	app.thead.n = 0;
+	for (let i = 0; i < needles.length; i++)
+	{
+		let r = str.indexOf(needles[i], fromIndex);
+		if(r >= 0)
+		{
+			return r;
+		}
+	}
+	return -1;
 }
+
+const COLINDEX = 
+{
+	DATETIME: 0,
+	DATETIME_STR: 1,
+	CLIENT_IP: 2,
+	REQUEST_ID: 3,
+	METHOD: 4,
+	SOURCE_CONTEXT: 5,
+	MESSAGE: 6,
+	LEVEL: 7,
+}
+
+
+function getcolor(s)
+{
+	switch(s)
+	{
+	case 'Error':return "#FAA";
+	case 'Warning':return "#FF7";
+	case 'Verbose':return "#defff8";
+	case 'Debug':return "#f4edff";
+	default:return "#EEE";
+	}
+}
+
+
+function getlevel(s)
+{
+	switch(s)
+	{
+	case 'Error':return "❌";
+	case 'Warning':return "⚠️";
+	case 'Verbose':return "👀";
+	case 'Debug':return "🕵️‍♂️";
+	default:return "ℹ️";
+	}
+}
+
+function app_make_onclick(app, ck, n)
+{
+	return function()
+	{
+		let cv = app.colname[ck];
+		//console.log(app.input, cv, n);
+		if (app.input[ck].value)
+		{
+			app.input[ck].value = "";
+		}
+		else
+		{
+			app.input[ck].value = app.data[cv][n];
+		}
+		app.input[ck].oninput();
+	}
+}
+
+
+function common_column_th(e, config, column)
+{
+	//console.log(column);
+	switch(column)
+	{
+		case COLINDEX.DATETIME_STR:
+			e.textContent = '📅 Time';
+			break;
+			case COLINDEX.CLIENT_IP:
+			e.textContent = 'ClientIp';
+			break;
+		case COLINDEX.REQUEST_ID:
+			e.textContent = 'RequestId';
+			break;
+		case COLINDEX.METHOD:
+			e.textContent = 'Method';
+			break;
+		case COLINDEX.SOURCE_CONTEXT:
+			e.textContent = 'SourceContext';
+			break;
+		case COLINDEX.MESSAGE:
+			e.textContent = '💬 Message';
+			break;
+	}
+}
+
+
+
+function common_column_td(e, config, ck)
+{
+	let v;
+	let cv = config.colname[ck];
+	switch(cv)
+	{
+		case COLINDEX.DATETIME_STR:
+			e.textContent = config.data[COLINDEX.DATETIME_STR][config.n];
+			e.style.backgroundColor = random_hsla(e.textContent);
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			break;
+		case COLINDEX.CLIENT_IP:
+			e.textContent = config.data[COLINDEX.CLIENT_IP][config.n];
+			e.style.backgroundColor = random_hsla(e.textContent);
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			break;
+		case COLINDEX.REQUEST_ID:
+			e.textContent = config.data[COLINDEX.REQUEST_ID][config.n];
+			e.style.backgroundColor = random_hsla(e.textContent);
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			break;
+		case COLINDEX.METHOD:
+			v = config.data[COLINDEX.METHOD][config.n];
+			e.style.width = "50px"
+			if(v)
+			{
+				e.textContent = v;
+				e.style.backgroundColor = random_hsla(v);
+			}
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			break;
+		case COLINDEX.SOURCE_CONTEXT:
+			e.textContent = config.data[COLINDEX.SOURCE_CONTEXT][config.n];
+			e.style.backgroundColor = random_hsla(e.textContent);
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			break;
+		case COLINDEX.MESSAGE:
+			let level = config.data[COLINDEX.LEVEL][config.n];
+			e.style.backgroundColor = getcolor(level);
+			e.ondblclick = app_make_onclick(config, ck, config.n);
+			{
+				let summary = document.createElement("summary");
+				let m = config.data[COLINDEX.MESSAGE][config.n];
+				let j = indexOf(m, "\n ", 30);
+				summary.textContent = getlevel(level) + ' ' + m.substring(0, j);
+				let details = document.createElement("details");
+				details.appendChild(summary);
+				//details.innerHTML += '<hr>' + m;
+				details.innerHTML += '<br>' + m;
+				e.appendChild(details);
+			}
+			break;
+	}
+}
+
+
+
+
+
 
 
 
@@ -40,100 +165,80 @@ function table_init(app)
 
 function table_head(app)
 {
-	var tr;
-	var th;
+	let tr;
+	let th;
 	tr = app.thead.insertRow(-1);
-	for (let c in app.colname)
+	for (let ck in app.colname)
 	{
-		th = table_insert_th(tr);
-		th.textContent = app.colname[c];
+		let th = document.createElement('th');
+		common_column_th(th, app, app.colname[ck])
+		tr.appendChild(th);
 	}
 	tr = app.thead.insertRow(-1);
-	for (let c in app.colname)
+	for (let ck in app.colname)
 	{
 		th = table_insert_th(tr);
-		app.input[c] = document.createElement('input');
-		app.input[c].style.width = "100%";
-		th.appendChild(app.input[c]);
-		app.input[c].oninput = function()
+		app.input[ck] = document.createElement('input');
+		app.input[ck].style.width = "100%";
+		th.appendChild(app.input[ck]);
+		app.input[ck].oninput = (e) =>
 		{
-			table_press(app, c);
+			table_press(app, ck);
 		}
 	}
 }
 
-function table_press(app, c)
+
+//Filter a column
+function table_press(app, ck)
 {
-	console.log(app);
-	var children = app.tbody.children;
-	var value = app.input[c].value;
-	for (var i = 0; i < children.length; i++)
+	//console.log(app);
+	let children = app.tbody.children;
+	let value = app.input[ck].value;
+	let cv = app.colname[ck];
+	for (let i = 0; i < children.length; i++)
 	{
-		var a = app.data[c][i].includes(value);
-		app.filter[i] &= ~(1 << c);
-		app.filter[i] |= (a << c);
+		let a = app.data[cv][i].includes(value);
+		//Set bit (c) to (a)
+		app.filter[i] &= ~(1 << cv);
+		app.filter[i] |= (a << cv);
 	}
-	for (var i = 0; i < children.length; i++)
+	for (let i = 0; i < children.length; i++)
 	{
-		children[i].style.visibility = (app.filter[i] == ~0) ? "visible" : "collapse";
+		let index = children.length - 1 - i;
+		children[index].style.visibility = (app.filter[i] == ~0) ? "visible" : "collapse";
 	}
 }
 
-
+//Filter a row
 function table_filter_one(app, i)
 {
-	var children = app.tbody.children;
-	for (let c in app.colname)
+	let children = app.tbody.children;
+	for (let ck in app.colname)
 	{
-		var value = app.input[c].value;
-		var a = app.data[c][i].includes(value);
-		app.filter[i] &= ~(1 << c);
-		app.filter[i] |= (a << c);
+		let cv = app.colname[ck];
+		let value = app.input[ck].value;
+		//console.log(app.data[cv][i], cv, i);
+		let a = app.data[cv][i].includes(value);
+		//Set bit (c) to (a)
+		app.filter[i] &= ~(1 << cv);
+		app.filter[i] |= (a << cv); 
 	}
-	children[i].style.visibility = (app.filter[i] == ~0) ? "visible" : "collapse";
+	let index = children.length - 1 - i;
+	children[index].style.visibility = (app.filter[i] == ~0) ? "visible" : "collapse";
 }
 
 
 
 
 
-function getcolor(s)
-{
-	if (s == "Error")
-	{
-		return "#FAA";
-	}
-	else if (s == "Warning")
-	{
-		return "#FF7";
-	}
-	else if (s == "Verbose")
-	{
-		return "#defff8";
-	}
-	else if (s == "Debug")
-	{
-		return "#f4edff";
-	}
-	return "#EEE";
-}
 
 
-function app_make_onclick(app, c, n)
-{
-	return function()
-	{
-		if (app.input[c].value)
-		{
-			app.input[c].value = "";
-		}
-		else
-		{
-			app.input[c].value = app.data[c][n];
-		}
-		app.input[c].oninput();
-	}
-}
+
+
+
+
+
 
 
 
@@ -141,94 +246,93 @@ function app_append(app, row)
 {
 	//console.log(app.data);
 	//["Time", "ClientIp", "RequestId", "Method", "SourceContext", "Message"];
-	app.data[0][app.n] = formatdate(new Date(row["@t"]));
-	app.data[1][app.n] = row["ClientIp"] ? row["ClientIp"] : "";
-	app.data[2][app.n] = row["RequestId"] ? row["RequestId"] : "";
-	app.data[3][app.n] = row["Method"] ? row["Method"] : "";
-	app.data[4][app.n] = row["SourceContext"] ? row["SourceContext"] : "";
-	app.data[5][app.n] = row["@m"] ? row["@m"] : "";
-
-	app.data[6][app.n] = new Date(row["@t"]);
-	app.data[7][app.n] = row["@l"];
-
+	app.data[COLINDEX.DATETIME][app.n] = new Date(row["@t"]);
+	app.data[COLINDEX.DATETIME_STR][app.n] = formatdate(new Date(row["@t"]));
+	app.data[COLINDEX.CLIENT_IP][app.n] = row["ClientIp"] ? row["ClientIp"] : "";
+	app.data[COLINDEX.REQUEST_ID][app.n] = row["RequestId"] ? row["RequestId"] : "";
+	app.data[COLINDEX.METHOD][app.n] = row["Method"] ? row["Method"] : "";
+	app.data[COLINDEX.SOURCE_CONTEXT][app.n] = row["SourceContext"] ? row["SourceContext"] : "";
+	app.data[COLINDEX.MESSAGE][app.n] = row["@m"] ? row["@m"] : "";
+	app.data[COLINDEX.LEVEL][app.n] = row["@l"];
 	app.filter[app.n] = ~0;
-
-	let tr;//Table row
-	let td;//Table cell
-	tr = app.tbody.insertRow(-1);
-	//td = tr.insertCell(-1);
-	//td.textContent = data["@l"] ? data["@l"] : "Information";
-
-
-	td = tr.insertCell(-1);
-	td.textContent = app.data[0][app.n];
-	td.style.backgroundColor = random_hsla(td.textContent);
-	td.onclick = app_make_onclick(app, 0, app.n);
-
-	td = tr.insertCell(-1);
-	td.textContent = row["ClientIp"];
-	if (row["ClientIp"]) td.style.backgroundColor = random_hsla(row["ClientIp"]);
-	td.onclick = app_make_onclick(app, 1, app.n);
-
-	td = tr.insertCell(-1);
-	td.textContent = row["RequestId"];
-	if (row["RequestId"]) td.style.backgroundColor = random_hsla(row["RequestId"]);
-	td.onclick = app_make_onclick(app, 2, app.n);
-
-	td = tr.insertCell(-1);
-	td.style.width = "50px"
-	if(row["Method"])
+	let tr = app.tbody.insertRow(0);
+	for (let ck in app.colname)
 	{
-		td.textContent = row["Method"];
-		td.style.backgroundColor = random_hsla(row["Method"]);
+		let td = tr.insertCell(-1);
+		common_column_td(td, app, ck);
+		tr.appendChild(td);
 	}
-	td.onclick = app_make_onclick(app, 3, app.n);
-
-	td = tr.insertCell(-1);
-	td.textContent = row["SourceContext"];
-	if (row["SourceContext"]) td.style.backgroundColor = random_hsla(row["SourceContext"]);
-	td.onclick = app_make_onclick(app, 4, app.n);
-
-	td = tr.insertCell(-1);
-	td.textContent = row["@m"];
-	td.style.backgroundColor = getcolor(row["@l"]);
-	td.onclick = app_make_onclick(app, 5, app.n);
-
-	//if (data["@mt"])
-	{
-		//td.textContent = template(data["@mt"], data);
-	}
-	
 	table_filter_one(app, app.n);
 	app.n++;
 }
 
 
-function ws_connect()
-{
-	console.log(element_url.value);
-	socket = new WebSocket(element_url.value);
-	socket.onopen = function (event)
-	{
-		table_init(myapp);
-		table_head(myapp);
-	};
-	socket.onclose = function (event)
-	{
 
+
+
+function table_init(app)
+{
+	app.tbody.innerHTML = "";
+	app.thead.innerHTML = "";
+	app.n = 0;
+	app.data = [];
+	app.filter = [];
+	app.input = [];
+	app.colname = [COLINDEX.DATETIME_STR, COLINDEX.CLIENT_IP, COLINDEX.REQUEST_ID, COLINDEX.SOURCE_CONTEXT, COLINDEX.MESSAGE];
+	for (let ck in COLINDEX)
+	{
+		app.data[COLINDEX[ck]] = [];
+	}
+}
+
+function ws_connect(app)
+{
+	//console.log(app);
+	if(app.socket instanceof WebSocket)
+	{
+		app.socket.close();
+	}
+	app.socket = new WebSocket(app.wsurl);
+	app.socket.onopen = function (event)
+	{
+		table_init(app);
+		table_head(app);
 	};
-	socket.onerror = function (event)
+	app.socket.onclose = function (event)
 	{
 		console.log(event);
-		element_status.innerText = "Unknown Error. You need to be /Siteadmin to connect to websocket.";
 	};
-	socket.onmessage = function (event)
+	app.socket.onerror = function (event)
+	{
+		console.log(event);
+	};
+	app.socket.onmessage = function (event)
 	{
 		var row = JSON.parse(event.data);
-		console.log(row);
-		app_append(myapp, row);
+		//console.log(row);
+		app_append(app, row);
 	};
 };
 
 
-ws_connect();
+
+
+
+let myapp = {};
+myapp.table = document.getElementById("mytable");
+myapp.thead = myapp.table.children[1];
+myapp.tbody = myapp.table.children[2];
+
+
+let e_btn_connect = document.getElementById("connect");
+let e_input_myurl = document.getElementById("myurl");
+e_input_myurl.value = ws_url("/wslog");
+
+e_btn_connect.onclick = (e) =>
+{
+	myapp.wsurl = e_input_myurl.value;
+	ws_connect(myapp);
+}
+
+myapp.wsurl = e_input_myurl.value;
+ws_connect(myapp);

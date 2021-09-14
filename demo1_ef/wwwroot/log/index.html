@@ -5,16 +5,30 @@
 	<meta charset="utf-8" />
 	<title>WS log</title>
 	<link rel="stylesheet" type="text/css" href="/arena.css"/>
+	<style>
+		summary
+		{
+			font-family: 'Times New Roman', Times, serif;
+		}
+	</style>
 </head>
 
 <body>
 	<div>
-		<label for="myurl">WebSocket Server URL:</label>
-		<input id="myurl" size="60" />
-		<button type="submit" onclick="ws_connect()">Connect</button>
+
 	</div>
-	<div id="mystatus"></div>
 	<table id="mytable">
+		<thead>
+			<tr>
+				<th colspan="100">
+					<label for="myurl">WebSocket Server URL:</label>
+					<input id="myurl" size="60" />
+					<button type="submit" id="connect">Connect</button>
+				</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+		<tbody></tbody>
 	</table>
 </body>
 

@@ -141,7 +141,8 @@ element_form.onsubmit = (event) =>
 	const producer_id = Number(event.target.producer_id.value);
 	const producer_longname = event.target.producer_id.querySelector('option[value="'+producer_id+'"]').innerText;
 	//Fuckery:
-	var f = location.hash.substring(1).split(",");
+	let h = location.hash.substring(1).split("/");
+	var f = h[1].split(",");
 	if (f[0] == ""){f = [];}
 	var i = f.indexOf(""+producer_id);
 	if (i >= 0)
@@ -152,34 +153,40 @@ element_form.onsubmit = (event) =>
 	{
 		f.push(""+producer_id);
 	}
-	location.hash = f.join(",");
+	location.hash = h[0] + '/' + f.join(",");
 }
 
 function hashchange1()
 {
-	var f = location.hash.substring(1).split(",");
-	console.log(f);
-	if (f.includes('a'))
+	let h = location.hash.substring(1).split("/");
+	let f = h[1].split(",");
+	switch(h[0])
 	{
-		element_form.remove(); 
-	}
-	for(let i = 0; i < element_plot.data.length; ++i)
-	{
-		let producer_id = element_plot.data[i].producer_id;
-		if (f.includes(""+producer_id) == false)
+	case 'producers-iframe':
+		element_form.remove();
+	case 'producers':
+		for(let i = 0; i < element_plot.data.length; ++i)
 		{
-			subscribe(socket, Number(producer_id), "", 0);
+			let producer_id = element_plot.data[i].producer_id;
+			if (f.includes(""+producer_id) == false)
+			{
+				subscribe(socket, Number(producer_id), "", 0);
+			}
 		}
-	}
-	for(let i = 0; i < f.length; ++i)
-	{
-		if (f[i] == ""){continue;}//Fuckery
-		var j = Number(f[i]);
-		if (isNaN(j) == false)
+		for(let i = 0; i < f.length; ++i)
 		{
-			subscribe(socket, Number(j), "", 1);
+			if (f[i] == ""){continue;}//Fuckery
+			var j = Number(f[i]);
+			if (isNaN(j) == false)
+			{
+				subscribe(socket, Number(j), "", 1);
+			}
 		}
+	default:
+		console.warn('Not implemented', h[0]);
+		break;
 	}
+
 }
 
 window.addEventListener('hashchange', hashchange1, false);

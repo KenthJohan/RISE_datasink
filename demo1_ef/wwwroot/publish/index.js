@@ -229,7 +229,7 @@ function update_iframe(ke_btnsub)
 	{
 		q += ke_btnsub[k].hasAttribute('sub') ? k+',' : '';
 	}
-	document.getElementById('iframe').src = '/subscribe/#a,' + q;
+	document.getElementById('iframe').src = '/subscribe/#producers-iframe/' + q;
 }
 
 
