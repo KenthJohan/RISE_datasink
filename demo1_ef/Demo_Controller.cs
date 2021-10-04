@@ -151,6 +151,28 @@ namespace Demo
 
 
 
+
+
+		[HttpGet("/wspub/{key}")]
+		public async Task wspub(string key)
+		{
+			var c = ControllerContext.HttpContext;
+			if (c.WebSockets.IsWebSocketRequest)
+			{
+				Log.Information("WebSocketRequest");
+			}
+			else
+			{
+				Log.Information("normal req");
+			}
+		}
+
+
+
+
+
+
+
 	}
 }
 

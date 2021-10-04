@@ -20,9 +20,9 @@ namespace Demo
 				Proc_Reader.read_stat("/proc/stat", ref stat1);
 				float load = (float)Proc_Reader.calc_load(stat0.cpu, stat1.cpu);
 				Sublist_Producer.publish(13, DateTime.Now, load);
-				Log.Information("load: {load}", load);
-				Log.Information("{@Proc_Stat}", stat0);
-				Log.Information("{@Proc_Meminfo}", meminfo);
+				//Log.Information("load: {load}", load);
+				//Log.Information("{@Proc_Stat}", stat0);
+				//Log.Information("{@Proc_Meminfo}", meminfo);
 			}
 		}
 

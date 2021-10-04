@@ -57,7 +57,7 @@ namespace Demo
 		//This must be perfomant.
 		public static void publish(int producer_id, DateTime time, float value)
 		{
-			log.Information("Publish {producer_id} {time} {value}", producer_id, time, value);
+			//log.Information("Publish {producer_id} {time} {value}", producer_id, time, value);
 			if (subs1.ContainsKey(producer_id))
 			{
 				foreach (WebSocket ws in subs1[producer_id])
