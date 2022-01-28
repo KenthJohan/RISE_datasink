@@ -31,9 +31,13 @@ namespace Demo
 		// 1Mhz = 100Hz * (10000 floats)
 		public static void recv(ReadOnlySpan<byte> buffer)
 		{
+			int layout_id = BinaryPrimitives.ReadInt32BigEndian(buffer.Slice(0));
+			if (Hub.dict_memlocs.ContainsKey(layout_id) == false)
+			{
+				return;
+			}
 			//"INSERT INTO floatvals (producer_id,time,value) VALUES (@producer_id, @time, @value)"
 			using var importer = DB.connection.BeginBinaryImport("COPY floatvals (producer_id, value) FROM STDIN (FORMAT binary)");
-			int layout_id = BinaryPrimitives.ReadInt32BigEndian(buffer.Slice(0));
 			foreach(Memloc memloc in Hub.dict_memlocs[layout_id])
 			{
 				//Debug.Assert(memloc.byteoffset > 3);

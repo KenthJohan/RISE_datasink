@@ -21,6 +21,12 @@ namespace Demo
 		private readonly Serilog.ILogger log = Log.ForContext<User_Mutation>();
 		public IQueryable<User> user_register([Service] Demo_Context context, string email, string password, string allowpw)
 		{
+			/*
+			var a = PW.salthash_create("secret");
+			string str = string.Join(" ", a.Select(b => string.Format("0x{0:X2},", b)));
+			Console.WriteLine(str);
+			return null;
+			*/
 			if (string.IsNullOrEmpty(email)){throw new QueryException(ErrorBuilder.New().SetMessage("The (email) cannot be empty.").SetCode("EMAIL_EMPTY").Build());}
 			if (string.IsNullOrEmpty(password)){throw new QueryException(ErrorBuilder.New().SetMessage("The (password) cannot be empty.").SetCode("PASSWORD_EMPTY").Build());}
 			if (string.IsNullOrEmpty(allowpw)){throw new QueryException(ErrorBuilder.New().SetMessage("The (allowpw) cannot be empty.").SetCode("ALLOWPW_EMPTY").Build());}

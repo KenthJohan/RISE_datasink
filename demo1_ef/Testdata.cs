@@ -145,6 +145,14 @@ namespace Demo
 				context.memlocs.AddRange(records);
 			}
 
+			{
+				User user = new User{email = "miloatv"};
+				user.guid = Guid.NewGuid();
+				user.pwhash = PW.salthash_create("miloatvpw");
+				log.Information("Adding {@User}", user);
+				context.users.Add(user);
+			}
+
 			int r = context.SaveChanges();
 			Log.Information("SaveChanges {r}", r);
 		}

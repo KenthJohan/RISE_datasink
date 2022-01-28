@@ -139,6 +139,30 @@ namespace Demo
 		}
 
 
+		[HttpGet("/wslogin/{email}/{password}/pub/layout")]
+		public async Task wspub([FromServices] Demo_Context context, string email, string password)
+		{
+			var c = ControllerContext.HttpContext;
+			User user = context.users.FirstOrDefault(u => u.email == email);
+			if (user == null){return;}
+			bool success = PW.salthash_verify(password, user.pwhash);
+			log.Information("The {@User} login status: {success}", user, success);
+			if (success == false)
+			{
+				c.Response.StatusCode = 400;
+				await c.Response.WriteAsync("Login failed");
+				return;
+			}
+			if (c.WebSockets.IsWebSocketRequest)
+			{
+				await Publist_Layout.accept(await c.WebSockets.AcceptWebSocketAsync());
+			}
+			else
+			{
+				c.Response.StatusCode = 400;
+				await c.Response.WriteAsync("WebSocket does not work :(");
+			}
+		}
 
 
 
@@ -151,21 +175,6 @@ namespace Demo
 
 
 
-
-
-		[HttpGet("/wspub/{key}")]
-		public async Task wspub(string key)
-		{
-			var c = ControllerContext.HttpContext;
-			if (c.WebSockets.IsWebSocketRequest)
-			{
-				Log.Information("WebSocketRequest");
-			}
-			else
-			{
-				Log.Information("normal req");
-			}
-		}
 
 
 
